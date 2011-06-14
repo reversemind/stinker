@@ -29,13 +29,16 @@ module Stinker
     #
     # Returns the formatted String content.
     def render(no_follow = false)
-      sanitize = no_follow ?
-        @site.history_sanitizer :
-        @site.sanitizer
+      # sanitize = no_follow ?
+        # @site.history_sanitizer :
+        # @site.sanitizer
 
-      data = extract_tex(@data.dup)
-      data = extract_code(data)
-      data = extract_tags(data)
+      sanitize = false
+      data = @data.dup
+
+      # data = extract_tex(@data.dup)
+      # data = extract_code(data)
+      # data = extract_tags(data)
       begin
         data = GitHub::Markup.render(@name, data)
         if data.nil?
@@ -44,15 +47,15 @@ module Stinker
       rescue Object => e
         data = %{<p class="gollum-error">#{e.message}</p>}
       end
-      data = process_tags(data)
-      data = process_code(data)
+      # data = process_tags(data)
+      # data = process_code(data)
       if sanitize || block_given?
         doc  = Nokogiri::HTML::DocumentFragment.parse(data)
         doc  = sanitize.clean_node!(doc) if sanitize
         yield doc if block_given?
         data = doc_to_html(doc)
       end
-      data = process_tex(data)
+      # data = process_tex(data)
       data.gsub!(/<p><\/p>/, '')
       data
     end

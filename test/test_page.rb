@@ -28,7 +28,16 @@ context "Page" do
 
   test "get nested page" do
     page = @wiki.page('Eye Of Sauron')
+    page2 = @wiki.page('Mordor/Eye Of Sauron')
+    page3 = @wiki.page('/Mordor/Eye Of Sauron')
+    not_exist = @wiki.page('Bordor/Eye Of Sauron')
+    page4 = @wiki.page('Mordor/Eye-Of-Sauron')
     assert_equal 'Mordor/Eye-Of-Sauron.md', page.path
+    assert_equal page.path, page2.path
+    assert_equal page.path, page3.path
+    assert_equal page.path, page4.path
+    assert_nil not_exist
+    
   end
 
   test "page versions" do
@@ -69,7 +78,7 @@ context "Page" do
   test "cname" do
     assert_equal "Foo", Stinker::Page.cname("Foo")
     assert_equal "Foo-Bar", Stinker::Page.cname("Foo Bar")
-    assert_equal "Foo---Bar", Stinker::Page.cname("Foo / Bar")
+    assert_equal "Foo-/-Bar", Stinker::Page.cname("Foo / Bar")
     assert_equal "José", Stinker::Page.cname("José")
     assert_equal "モルドール", Stinker::Page.cname("モルドール")
   end

@@ -247,7 +247,7 @@ module Stinker
     # Returns the String canonical name.
     def self.cname(name)
       name.respond_to?(:gsub)      ?
-        name.gsub(%r{[ /<>]}, '-') :
+        name.gsub(%r{[ <>]}, '-') :
         ''
     end
 
@@ -315,6 +315,16 @@ module Stinker
       return nil if !map || name.to_s.empty?
       if checked_dir = BlobEntry.normalize_dir(checked_dir)
         checked_dir.downcase!
+      end
+      if checked_dir.nil? && name =~ /\//
+        paths = name.split('/')
+        new_name = paths.pop
+        dir_check = paths.join('/')
+        checked_dir = BlobEntry.normalize_dir(dir_check) unless dir_check.empty?
+        if checked_dir
+          checked_dir.downcase!
+          name = new_name
+        end
       end
 
       map.each do |entry|

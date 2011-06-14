@@ -80,7 +80,7 @@ context "Wiki page previewing" do
   test "preview_page" do
     page = @wiki.preview_page("Test", "# Bilbo", :markdown)
     assert_equal "# Bilbo", page.raw_data
-    assert_equal "<h1>Bilbo</h1>", page.formatted_data
+    assert_equal "<h1>Bilbo</h1>\n", page.formatted_data
     assert_equal "Test.md", page.filename
     assert_equal "Test", page.name
   end
@@ -111,10 +111,31 @@ context "Wiki page writing" do
 
   test "is not allowed to overwrite file" do
     @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("bob/dole", :markdown, "# Gollum", commit_details)
     assert_raises Stinker::DuplicatePageError do
-      @wiki.write_page("ABC DEF", :textile,  "# Gollum", commit_details)
+      @wiki.write_page("Abc Def", :textile,  "# Gollum", commit_details)
+    end
+    assert_raises Stinker::DuplicatePageError do
+      @wiki.write_page("bob/dole", :textile,  "# Gollum", commit_details)
+    end
+    assert_raises Stinker::DuplicatePageError do
+      @wiki.write_page("/bob/dole", :textile,  "# Gollum", commit_details)
+    end
+    assert_nothing_raised do
+      @wiki.write_page("/BOB/dole", :textile,  "# Gollum", commit_details)
+      @wiki.write_page("Dole", :textile,  "# Gollum", commit_details)
+
     end
   end
+
+  test "is allowed to have similar filenames if not in same dir" do
+    @wiki.write_page("Abc/Def", :markdown, "# Gollum", commit_details)
+    assert_nothing_raised  do
+      @wiki.write_page("Def/Def", :markdown,  "# Gollum", commit_details)
+      @wiki.write_page("Abc-Def", :markdown,  "# Gollum", commit_details)
+    end
+  end
+  
 
   test "update_page" do
     @wiki.write_page("Gollum", :markdown, "# Gollum", commit_details)
@@ -181,6 +202,9 @@ context "Wiki page writing" do
     assert_equal "lotr/Gollum.textile", page.path
     assert_equal :textile, page.format
     assert_equal "h1. Gollum", page.raw_data
+
+    page2 = @wiki.page("lotr/Gollum")
+    assert_equal page2.path, page.path
   end
 
   test "delete root page" do

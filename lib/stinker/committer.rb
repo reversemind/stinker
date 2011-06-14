@@ -85,7 +85,12 @@ module Stinker
     # Returns nothing (modifies the Index in place).
     def add_to_index(dir, name, format, data, allow_same_ext = false)
       path = @site.page_file_name(name, format)
-
+      if dir.strip.empty? && path =~ /\//
+        path_parts = path.split('/')
+        path = path_parts.pop
+        path_parts.shift if path_parts.first.empty?
+        dir = path_parts.join('/')
+      end
       dir = '/' if dir.strip.empty?
 
       fullpath = ::File.join(*[@site.page_file_dir, dir, path].compact)
