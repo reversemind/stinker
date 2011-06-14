@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "GitAccess" do
   setup do
-    @access = Gollum::GitAccess.new(testpath("examples/lotr.git"))
+    @access = Stinker::GitAccess.new(testpath("examples/lotr.git"))
   end
 
   test "#commit fills commit_map cache" do

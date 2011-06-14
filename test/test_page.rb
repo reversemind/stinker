@@ -3,18 +3,18 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Page" do
   setup do
-    @wiki = Gollum::Wiki.new(testpath("examples/lotr.git"))
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
   end
 
   test "new page" do
-    page = Gollum::Page.new(@wiki)
+    page = Stinker::Page.new(@wiki)
     assert_nil page.raw_data
     assert_nil page.formatted_data
   end
 
   test "get existing page" do
     page = @wiki.page('Bilbo Baggins')
-    assert_equal Gollum::Page, page.class
+    assert_equal Stinker::Page, page.class
     assert page.raw_data =~ /^# Bilbo Baggins\n\nBilbo Baggins/
     assert page.formatted_data =~ /<h1>Bilbo Baggins<\/h1>\n\n<p>Bilbo Baggins/
     assert_equal 'Bilbo-Baggins.md', page.path
@@ -67,11 +67,11 @@ context "Page" do
   end
 
   test "cname" do
-    assert_equal "Foo", Gollum::Page.cname("Foo")
-    assert_equal "Foo-Bar", Gollum::Page.cname("Foo Bar")
-    assert_equal "Foo---Bar", Gollum::Page.cname("Foo / Bar")
-    assert_equal "José", Gollum::Page.cname("José")
-    assert_equal "モルドール", Gollum::Page.cname("モルドール")
+    assert_equal "Foo", Stinker::Page.cname("Foo")
+    assert_equal "Foo-Bar", Stinker::Page.cname("Foo Bar")
+    assert_equal "Foo---Bar", Stinker::Page.cname("Foo / Bar")
+    assert_equal "José", Stinker::Page.cname("José")
+    assert_equal "モルドール", Stinker::Page.cname("モルドール")
   end
 
   test "title from filename with normal contents" do
@@ -131,16 +131,16 @@ context "Page" do
   end
 
   test "cannot convert non string to human readable page title" do
-    assert_equal '', Gollum::Page.cname(nil)
-    assert_equal '', Gollum::Page.cname(3)
+    assert_equal '', Stinker::Page.cname(nil)
+    assert_equal '', Stinker::Page.cname(3)
   end
 
   test "normalize_dir" do
-    assert_equal "", Gollum::BlobEntry.normalize_dir("")
-    assert_equal "", Gollum::BlobEntry.normalize_dir(".")
-    assert_equal "", Gollum::BlobEntry.normalize_dir("/")
-    assert_equal "", Gollum::BlobEntry.normalize_dir("c:/")
-    assert_equal "/foo", Gollum::BlobEntry.normalize_dir("foo")
-    assert_equal "/foo", Gollum::BlobEntry.normalize_dir("/foo")
+    assert_equal "", Stinker::BlobEntry.normalize_dir("")
+    assert_equal "", Stinker::BlobEntry.normalize_dir(".")
+    assert_equal "", Stinker::BlobEntry.normalize_dir("/")
+    assert_equal "", Stinker::BlobEntry.normalize_dir("c:/")
+    assert_equal "/foo", Stinker::BlobEntry.normalize_dir("foo")
+    assert_equal "/foo", Stinker::BlobEntry.normalize_dir("/foo")
   end
 end

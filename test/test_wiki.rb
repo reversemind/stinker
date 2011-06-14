@@ -3,7 +3,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
 context "Wiki" do
   setup do
-    @wiki = Gollum::Wiki.new(testpath("examples/lotr.git"))
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
   end
 
   test "repo path" do
@@ -16,19 +16,19 @@ context "Wiki" do
   end
 
   test "shows paginated log with no page" do
-    Gollum::Wiki.per_page = 3
+    Stinker::Site.per_page = 3
     commits = @wiki.repo.commits[0..2].map { |x| x.id }
     assert_equal commits, @wiki.log.map { |c| c.id }
   end
 
   test "shows paginated log with 1st page" do
-    Gollum::Wiki.per_page = 3
+    Stinker::Site.per_page = 3
     commits = @wiki.repo.commits[0..2].map { |x| x.id }
     assert_equal commits, @wiki.log(:page => 1).map { |c| c.id }
   end
 
   test "shows paginated log with next page" do
-    Gollum::Wiki.per_page = 3
+    Stinker::Site.per_page = 3
     commits = @wiki.repo.commits[3..5].map { |x| x.id }
     assert_equal commits, @wiki.log(:page => 2).map { |c| c.id }
   end
@@ -45,7 +45,7 @@ context "Wiki" do
   end
 
   test "text_data" do
-    wiki = Gollum::Wiki.new(testpath("examples/yubiwa.git"))
+    wiki = Stinker::Site.new(testpath("examples/yubiwa.git"))
     if String.instance_methods.include?(:encoding)
       utf8 = wiki.page("strider").text_data
       assert_equal Encoding::UTF_8, utf8.encoding
@@ -74,7 +74,7 @@ end
 context "Wiki page previewing" do
   setup do
     @path = testpath("examples/lotr.git")
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
   end
 
   test "preview_page" do
@@ -91,7 +91,7 @@ context "Wiki page writing" do
     @path = testpath("examples/test.git")
     FileUtils.rm_rf(@path)
     Grit::Repo.init_bare(@path)
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
   end
 
   test "write_page" do
@@ -111,7 +111,7 @@ context "Wiki page writing" do
 
   test "is not allowed to overwrite file" do
     @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)
-    assert_raises Gollum::DuplicatePageError do
+    assert_raises Stinker::DuplicatePageError do
       @wiki.write_page("ABC DEF", :textile,  "# Gollum", commit_details)
     end
   end
@@ -218,7 +218,7 @@ context "Wiki sync with working directory" do
   setup do
     @path = testpath('examples/wdtest')
     Grit::Repo.init(@path)
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
   end
 
   test "write a page" do
@@ -274,7 +274,7 @@ context "page_file_dir option" do
     @path = cloned_testpath('examples/page_file_dir')
     @repo = Grit::Repo.init(@path)
     @page_file_dir = 'docs'
-    @wiki = Gollum::Wiki.new(@path, :page_file_dir => @page_file_dir)
+    @wiki = Stinker::Site.new(@path, :page_file_dir => @page_file_dir)
   end
 
   test "write a page in sub directory" do
@@ -307,7 +307,7 @@ context "Wiki page writing with different branch" do
     @path = testpath("examples/test.git")
     FileUtils.rm_rf(@path)
     @repo = Grit::Repo.init_bare(@path)
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
 
     # We need an initial commit to create the master branch
     # before we can create new branches
@@ -316,7 +316,7 @@ context "Wiki page writing with different branch" do
 
     # Create our test branch and check it out
     @repo.update_ref("test", @repo.commits.first.id)
-    @branch = Gollum::Wiki.new(@path, :ref => "test")
+    @branch = Stinker::Site.new(@path, :ref => "test")
   end
 
   teardown do

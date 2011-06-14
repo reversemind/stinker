@@ -6,7 +6,7 @@ context "Markup" do
     @path = testpath("examples/test.git")
     FileUtils.rm_rf(@path)
     Grit::Repo.init_bare(@path)
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
   end
 
   teardown do
@@ -20,18 +20,18 @@ context "Markup" do
 
   # This test is to assume that Sanitize.clean doesn't raise Encoding::CompatibilityError on ruby 1.9
   test "formats non ASCII-7 character page from Wiki#pages" do
-    wiki = Gollum::Wiki.new(testpath("examples/yubiwa.git"))
+    wiki = Stinker::Site.new(testpath("examples/yubiwa.git"))
     assert_nothing_raised(defined?(Encoding) && Encoding::CompatibilityError) do
       assert wiki.page("strider").formatted_data
     end
   end
 
-  test "Gollum::Markup#render yields a DocumentFragment" do
+  test "Stinker::Markup#render yields a DocumentFragment" do
     yielded = false
     @wiki.write_page("Yielded", :markdown, "abc", commit_details)
 
     page   = @wiki.page("Yielded")
-    markup = Gollum::Markup.new(page)
+    markup = Stinker::Markup.new(page)
     markup.render do |doc|
       assert_kind_of Nokogiri::HTML::DocumentFragment, doc
       yielded = true
@@ -39,7 +39,7 @@ context "Markup" do
     assert yielded
   end
 
-  test "Gollum::Page#formatted_data yields a DocumentFragment" do
+  test "Stinker::Page#formatted_data yields a DocumentFragment" do
     yielded = false
     @wiki.write_page("Yielded", :markdown, "abc", commit_details)
 
@@ -128,7 +128,7 @@ context "Markup" do
   test "page link with custom base path" do
     ["/wiki", "/wiki/"].each_with_index do |path, i|
       name = "Bilbo Baggins #{i}"
-      @wiki = Gollum::Wiki.new(@path, :base_path => path)
+      @wiki = Stinker::Site.new(@path, :base_path => path)
       @wiki.write_page(name, :markdown, "a [[#{name}]] b", commit_details)
 
       page = @wiki.page(name)
@@ -205,7 +205,7 @@ context "Markup" do
   end
 
   test "image with absolute path" do
-    @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
+    @wiki = Stinker::Site.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("alpha.jpg", "hi")
     index.commit("Add alpha.jpg")
@@ -216,7 +216,7 @@ context "Markup" do
   end
 
   test "image with relative path on root" do
-    @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
+    @wiki = Stinker::Site.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("alpha.jpg", "hi")
     index.add("Bilbo-Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
@@ -227,7 +227,7 @@ context "Markup" do
   end
 
   test "image with relative path" do
-    @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
+    @wiki = Stinker::Site.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("greek/alpha.jpg", "hi")
     index.add("greek/Bilbo-Baggins.md", "a [[alpha.jpg]] [[a | alpha.jpg]] b")
@@ -239,7 +239,7 @@ context "Markup" do
   end
 
   test "image with absolute path on a preview" do
-    @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
+    @wiki = Stinker::Site.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("alpha.jpg", "hi")
     index.commit("Add alpha.jpg")
@@ -249,7 +249,7 @@ context "Markup" do
   end
 
   test "image with relative path on a preview" do
-    @wiki = Gollum::Wiki.new(@path, :base_path => '/wiki')
+    @wiki = Stinker::Site.new(@path, :base_path => '/wiki')
     index = @wiki.repo.index
     index.add("alpha.jpg", "hi")
     index.add("greek/alpha.jpg", "hi")
@@ -344,7 +344,7 @@ context "Markup" do
     @wiki.write_page("Bilbo Baggins", :markdown, "a [[Alpha|/alpha.jpg]] b", commit_details)
 
     page = @wiki.page("Bilbo Baggins")
-    output = Gollum::Markup.new(page).render
+    output = Stinker::Markup.new(page).render
     assert_equal %{<p>a <a href="/alpha.jpg">Alpha</a> b</p>}, output
   end
 
@@ -355,7 +355,7 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
-    output = Gollum::Markup.new(page).render
+    output = Stinker::Markup.new(page).render
     assert_equal %{<p>a <a href="/greek/alpha.jpg">Alpha</a> b</p>}, output
   end
 
@@ -385,7 +385,7 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
-    rendered = Gollum::Markup.new(page).render
+    rendered = Stinker::Markup.new(page).render
     assert_equal output, rendered
   end
 
@@ -400,7 +400,7 @@ context "Markup" do
     index.commit("Add alpha.jpg")
 
     page = @wiki.page("Bilbo Baggins")
-    rendered = Gollum::Markup.new(page).render
+    rendered = Stinker::Markup.new(page).render
     assert_equal output, rendered
   end
 
@@ -468,16 +468,16 @@ context "Markup" do
   end
 
   test "id with prefix ok" do
-    content = "h2(example#wiki-foo). xxxx"
-    output = %(<h2 class="example" id="wiki-foo">xxxx</h2>)
+    content = "h2(example#site-foo). xxxx"
+    output = %(<h2 class="example" id="site-foo">xxxx</h2>)
     compare(content, output, :textile)
   end
 
   test "id prefix added" do
     content = "h2(#foo). xxxx[1]\n\nfn1.footnote"
-    output = "<h2 id=\"wiki-foo\">xxxx" +
-             "<sup class=\"footnote\"><a href=\"#wiki-fn1\">1</a></sup></h2>" +
-             "\n<p class=\"footnote\" id=\"wiki-fn1\"><sup>1</sup> footnote</p>"
+    output = "<h2 id=\"site-foo\">xxxx" +
+             "<sup class=\"footnote\"><a href=\"#site-fn1\">1</a></sup></h2>" +
+             "\n<p class=\"footnote\" id=\"site-fn1\"><sup>1</sup> footnote</p>"
     compare(content, output, :textile)
   end
 
@@ -511,7 +511,7 @@ context "Markup" do
     index.commit("Add baggins")
 
     page = @wiki.page("Bilbo Baggins")
-    rendered = Gollum::Markup.new(page).render
+    rendered = Stinker::Markup.new(page).render
     if regexes.empty?
       assert_equal output, rendered
     else
@@ -527,7 +527,7 @@ context "Markup" do
 
     @wiki.clear_cache
     page = @wiki.page("Bilbo Baggins")
-    rendered = Gollum::Markup.new(page).render
+    rendered = Stinker::Markup.new(page).render
     assert_equal output, rendered
   end
 end

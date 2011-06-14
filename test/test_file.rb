@@ -4,11 +4,11 @@ require File.expand_path(path)
 
 context "File" do
   setup do
-    @wiki = Gollum::Wiki.new(testpath("examples/lotr.git"))
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
   end
 
   test "new file" do
-    file = Gollum::File.new(@wiki)
+    file = Stinker::File.new(@wiki)
     assert_nil file.raw_data
   end
 

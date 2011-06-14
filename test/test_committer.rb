@@ -1,27 +1,27 @@
 # ~*~ encoding: utf-8 ~*~
 require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 
-context "Wiki" do
+context "Site" do
   setup do
-    @wiki = Gollum::Wiki.new(testpath("examples/lotr.git"))
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
   end
 
   test "normalizes commit hash" do
     commit = {:message => 'abc'}
     name  = @wiki.repo.config['user.name']
     email = @wiki.repo.config['user.email']
-    committer = Gollum::Committer.new(@wiki, commit)
+    committer = Stinker::Committer.new(@wiki, commit)
     assert_equal name,  committer.actor.name
     assert_equal email, committer.actor.email
 
     commit[:name]  = 'bob'
     commit[:email] = ''
-    committer = Gollum::Committer.new(@wiki, commit)
+    committer = Stinker::Committer.new(@wiki, commit)
     assert_equal 'bob',  committer.actor.name
     assert_equal email, committer.actor.email
 
     commit[:email] = 'foo@bar.com'
-    committer = Gollum::Committer.new(@wiki, commit)
+    committer = Stinker::Committer.new(@wiki, commit)
     assert_equal 'bob',  committer.actor.name
     assert_equal 'foo@bar.com', committer.actor.email
   end
@@ -30,14 +30,14 @@ context "Wiki" do
     @path = cloned_testpath('examples/lotr.git')
     yielded = nil
     begin
-      wiki = Gollum::Wiki.new(@path)
-      committer = Gollum::Committer.new(wiki)
+      wiki = Stinker::Site.new(@path)
+      committer = Stinker::Committer.new(wiki)
       committer.after_commit do |index, sha1|
         yielded = sha1
         assert_equal committer, index
       end
 
-      res = wiki.write_page("Gollum", :markdown, "# Gollum", 
+      res = wiki.write_page("Stinker", :markdown, "# Stinker", 
         :committer => committer)
 
       assert_equal committer, res
@@ -51,14 +51,14 @@ context "Wiki" do
 
   test "parents with default master ref" do
     ref = 'a8ad3c09dd842a3517085bfadd37718856dee813'
-    committer = Gollum::Committer.new(@wiki)
+    committer = Stinker::Committer.new(@wiki)
     assert_equal ref,  committer.parents.first.sha
   end
 
   test "parents with custom ref" do
     ref = '60f12f4254f58801b9ee7db7bca5fa8aeefaa56b'
-    @wiki = Gollum::Wiki.new(testpath("examples/lotr.git"), :ref => ref)
-    committer = Gollum::Committer.new(@wiki)
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"), :ref => ref)
+    committer = Stinker::Committer.new(@wiki)
     assert_equal ref,  committer.parents.first.sha
   end
 end

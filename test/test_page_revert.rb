@@ -4,7 +4,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), "helper"))
 context "Page Reverting" do
   setup do
     @path = cloned_testpath("examples/revert.git")
-    @wiki = Gollum::Wiki.new(@path)
+    @wiki = Stinker::Site.new(@path)
   end
 
   teardown do

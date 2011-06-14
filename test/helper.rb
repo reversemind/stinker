@@ -10,8 +10,8 @@ $LOAD_PATH.unshift(File.join(dir, '..', 'lib'))
 $LOAD_PATH.unshift(dir)
 
 ENV['RACK_ENV'] = 'test'
-require 'gollum'
-require 'gollum/frontend/app'
+require 'stinker'
+require 'stinker/frontend/app'
 
 # Make sure we're in the test dir, the tests expect that to be the current
 # directory.

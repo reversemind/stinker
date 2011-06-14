@@ -6,8 +6,8 @@ context "Frontend" do
 
   setup do
     @path = cloned_testpath("examples/revert.git")
-    @wiki = Gollum::Wiki.new(@path)
-    Precious::App.set(:gollum_path, @path)
+    @wiki = Stinker::Site.new(@path)
+    Precious::App.set(:stinker_path, @path)
     Precious::App.set(:wiki_options, {})
   end
 
