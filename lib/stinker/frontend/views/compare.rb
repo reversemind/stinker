@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Compare < Layout
       attr_reader :page, :diff, :versions, :message

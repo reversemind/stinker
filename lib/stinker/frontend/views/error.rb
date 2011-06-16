@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Error < Layout
       attr_reader :message

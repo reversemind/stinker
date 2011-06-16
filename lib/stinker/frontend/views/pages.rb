@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Pages < Layout
       attr_reader :results, :ref

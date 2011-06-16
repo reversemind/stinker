@@ -36,12 +36,12 @@ context "Wiki" do
   test "list pages" do
     pages = @wiki.pages
     assert_equal \
-      %w(Bilbo-Baggins.md Eye-Of-Sauron.md Home.textile My-Precious.md),
+      %w(Bilbo-Baggins.md Eye-Of-Sauron.md Home.textile My-Precious.md Stinker.md),
       pages.map { |p| p.filename }.sort
   end
 
   test "counts pages" do
-    assert_equal 4, @wiki.size
+    assert_equal 5, @wiki.size
   end
 
   test "text_data" do
@@ -109,6 +109,25 @@ context "Wiki page writing" do
     assert @wiki.page("Gollum")
   end
 
+  test "write_page_with_meta" do
+    cd = commit_details
+    @wiki.write_page_with_meta("Gollum", :markdown, "# Gollum", {'title' => 'foobar'}, cd)
+    assert_equal 1, @wiki.repo.commits.size
+    assert_equal cd[:message], @wiki.repo.commits.first.message
+    assert_equal cd[:name], @wiki.repo.commits.first.author.name
+    assert_equal cd[:email], @wiki.repo.commits.first.author.email
+    assert @wiki.page("Gollum")
+    assert_equal "foobar", @wiki.page("Gollum").title
+
+    my_meta = {'title' => 'foo', 'bar'=> 'bar'}
+    @wiki.write_page_with_meta("Bilbo", :markdown, "# Bilbo", my_meta, commit_details)
+    assert_equal 2, @wiki.repo.commits.size
+    assert @wiki.page("Bilbo")
+    assert @wiki.page("Gollum")
+    assert_equal 'foo', @wiki.page("Bilbo").title
+    assert_equal my_meta, @wiki.page("Bilbo").meta_data
+  end
+
   test "is not allowed to overwrite file" do
     @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)
     @wiki.write_page("bob/dole", :markdown, "# Gollum", commit_details)
@@ -150,6 +169,44 @@ context "Wiki page writing" do
     assert_equal cd[:name], @wiki.repo.commits.first.author.name
     assert_equal cd[:email], @wiki.repo.commits.first.author.email
   end
+
+  test "update_page with meta" do
+    meta = {'title' => 'Gollum', 'foo' => 'bar'}
+    @wiki.write_page_with_meta("Gollum", :markdown, "# Gollum", meta, commit_details)
+
+    page = @wiki.page("Gollum")
+    assert_equal meta, page.meta_data
+    cd = commit_details
+    new_meta = {'meta' => true, 'title' => 'Gollum2'}
+    @wiki.update_page_with_meta(page, page.name, :markdown, "# Gollum2", new_meta, cd)
+
+    page = @wiki.page("Gollum")
+    assert_equal 2, @wiki.repo.commits.size
+    assert_equal "# Gollum2", @wiki.page("Gollum").raw_text_data
+    assert_equal cd[:message], @wiki.repo.commits.first.message
+    assert_equal cd[:name], @wiki.repo.commits.first.author.name
+    assert_equal cd[:email], @wiki.repo.commits.first.author.email
+    assert_equal new_meta, page.meta_data
+  end
+
+  test "update_page preserves meta if exists " do
+    meta = {'title' => 'Gollum', 'foo' => 'bar'}
+    @wiki.write_page_with_meta("Gollum", :markdown, "# Gollum", meta, commit_details)
+
+    page = @wiki.page("Gollum")
+    assert_equal meta, page.meta_data
+    cd = commit_details
+    @wiki.update_page(page, page.name, :markdown, "# Gollum2" , cd)
+
+    page = @wiki.page("Gollum")
+    assert_equal 2, @wiki.repo.commits.size
+    assert_equal "# Gollum2", @wiki.page("Gollum").raw_text_data
+    assert_equal cd[:message], @wiki.repo.commits.first.message
+    assert_equal cd[:name], @wiki.repo.commits.first.author.name
+    assert_equal cd[:email], @wiki.repo.commits.first.author.email
+    assert_equal meta, page.meta_data
+  end
+
 
   test "update page with format change" do
     @wiki.write_page("Gollum", :markdown, "# Gollum", commit_details)

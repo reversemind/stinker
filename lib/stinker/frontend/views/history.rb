@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class History < Layout
       attr_reader :page, :page_num

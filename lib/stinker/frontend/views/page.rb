@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Page < Layout
       attr_reader :content, :page, :footer

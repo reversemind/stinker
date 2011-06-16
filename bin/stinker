@@ -91,7 +91,7 @@ if options['irb']
   end
 
   begin
-    wiki = Stinker::Wiki.new(stinker_path, wiki_options)
+    wiki = Stinker::Site.new(stinker_path, wiki_options)
     if !wiki.exist? then raise Grit::InvalidGitRepositoryError end
     puts "Loaded Stinker wiki at #{File.expand_path(stinker_path).inspect}."
     puts
@@ -112,8 +112,8 @@ if options['irb']
   end
 else
   require 'stinker/frontend/app'
-  Precious::App.set(:stinker_path, stinker_path)
-  Precious::App.set(:wiki_options, wiki_options)
+  MyPrecious::App.set(:stinker_path, stinker_path)
+  MyPrecious::App.set(:wiki_options, wiki_options)
 
   if cfg = options['config']
     # If the path begins with a '/' it will be considered an absolute path,
@@ -122,5 +122,5 @@ else
     require cfg
   end
 
-  Precious::App.run!(options)
+  MyPrecious::App.run!(options)
 end

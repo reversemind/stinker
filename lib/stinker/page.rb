@@ -90,7 +90,7 @@ module Stinker
     # Returns a newly initialized Stinker::Page.
     def initialize(site)
       @site = site
-      @blob = @footer = @sidebar = nil
+      @blob = @footer = @meta = @sidebar = nil
     end
 
     # Public: The on-disk filename of the page including extension.
@@ -108,14 +108,16 @@ module Stinker
       self.class.canonicalize_filename(filename)
     end
 
-    # Public: If the first element of a formatted page is an <h1> tag it can
-    # be considered the title of the page and used in the display. If the
-    # first element is NOT an <h1> tag, the title will be constructed from the
+    # Public: If the meta data includes a title, it is used. If the
+    # meta doesn't have a title, the first h1 will be extracted. 
+    # As a last resort, the title will be constructed from the
     # filename by stripping the extension and replacing any dashes with
     # spaces.
     #
     # Returns the fully sanitized String title.
     def title
+      return meta_data["title"] if(@meta && @meta.has_key?('title'))
+      
       doc = Nokogiri::HTML(%{<div id="gollum-root">} + self.formatted_data + %{</div>})
 
       header =
@@ -150,6 +152,56 @@ module Stinker
     def raw_data
       @blob && @blob.data
     end
+    
+    # Public: The raw contents of the page, stripping meta.
+    #
+    # Returns the String data without meta.
+    def raw_text_data
+      data = raw_data
+      if data
+        # Check presence of metadata section
+        if data !~ /\A-{3,5}\s*$/
+          return data
+        end
+
+        # Split data
+        pieces = data.split(/^(-{5}|-{3})\s*$/)
+        if pieces.size < 4
+          raise RuntimeError.new(
+            "The file '#{content_filename}' appears to start with a metadata section (three or five dashes at the top) but it does not seem to be in the correct format."
+          )
+        end
+
+        pieces[4..-1].join.strip
+      else
+        data
+      end
+    end
+
+    # Public: The raw meta contents of the page.
+    #
+    # Returns the meta String data (yaml format).
+    def raw_meta_data
+      data = raw_data
+      if data
+        # Check presence of metadata section
+        if data !~ /\A-{3,5}\s*$/
+          return false
+        end
+
+        # Split data
+        pieces = data.split(/^(-{5}|-{3})\s*$/)
+        if pieces.size < 4
+          raise RuntimeError.new(
+            "The file '#{content_filename}' appears to start with a metadata section (three or five dashes at the top) but it does not seem to be in the correct format."
+          )
+        end
+
+        pieces[2]
+      else
+        data
+      end
+    end
 
     # Public: A text data encoded in specified encoding.
     #
@@ -157,10 +209,32 @@ module Stinker
     #
     # Returns a character encoding aware String.
     def text_data(encoding=nil)
-      if raw_data.respond_to?(:encoding)
-        raw_data.force_encoding(encoding || Encoding::UTF_8)
+      data = raw_text_data
+      if data.respond_to?(:encoding)
+        data.force_encoding(encoding || Encoding::UTF_8)
       else
-        raw_data
+        data
+      end
+    end
+
+    # Public: Set metadata to new hash
+    #
+    # meta - A Hash of metadata
+    def set_meta_data(meta)
+      @meta = meta
+    end
+
+    # Public: Metadata as extracted from the file
+    #
+    # reparse - Force reparsing of raw metadata (if blob's changed)
+    #
+    # Returns the Yaml parsed version of raw_meta_data
+    def meta_data(reparse = false)
+      return @meta if @meta && !reparse
+      if data = raw_meta_data
+        @meta = YAML.load(data)
+      else
+        @meta = {}
       end
     end
 
@@ -346,6 +420,7 @@ module Stinker
     def populate(blob, path=nil)
       @blob = blob
       @path = "#{path}/#{blob.name}"[1..-1]
+      @meta = meta_data(true)
       self
     end
 

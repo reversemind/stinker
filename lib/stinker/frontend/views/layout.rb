@@ -1,6 +1,6 @@
 require 'cgi'
 
-module Precious
+module MyPrecious
   module Views
     class Layout < Mustache
       include Rack::Utils

@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Search < Layout
       attr_reader :content, :page, :footer, :results, :query

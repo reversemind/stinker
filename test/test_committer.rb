@@ -37,7 +37,7 @@ context "Site" do
         assert_equal committer, index
       end
 
-      res = wiki.write_page("Stinker", :markdown, "# Stinker", 
+      res = wiki.write_page("Slinker", :markdown, "# Stinker", 
         :committer => committer)
 
       assert_equal committer, res
@@ -50,7 +50,7 @@ context "Site" do
   end
 
   test "parents with default master ref" do
-    ref = 'a8ad3c09dd842a3517085bfadd37718856dee813'
+    ref = 'e530a4733b4c9ea561b769ad6832a1399e3994ea'
     committer = Stinker::Committer.new(@wiki)
     assert_equal ref,  committer.parents.first.sha
   end

@@ -222,10 +222,34 @@ module Stinker
       multi_commit ? committer : committer.commit
     end
 
+    # Public: Write a new version of a page to the Stinker repo root.
+    #
+    # name   - The String name of the page.
+    # format - The Symbol format of the page.
+    # data   - The new String contents of the page.
+    # meta_data   - The Hash representing the metadata
+    # commit - The commit Hash details:
+    #          :message   - The String commit message.
+    #          :name      - The String author full name.
+    #          :email     - The String email address.
+    #          :parent    - Optional Grit::Commit parent to this update.
+    #          :tree      - Optional String SHA of the tree to create the
+    #                       index from.
+    #          :committer - Optional Stinker::Committer instance.  If provided,
+    #                       assume that this operation is part of batch of 
+    #                       updates and the commit happens later.
+    #
+    # Returns the String SHA1 of the newly written version, or the 
+    # Stinker::Committer instance if this is part of a batch update.
+    def write_page_with_meta(name, format, data, meta_data, commit = {})
+      write_page(name, format, combine_data(data, meta_data), commit)
+    end
+
     # Public: Update an existing page with new content. The location of the
     # page inside the repository will not change. If the given format is
     # different than the current format of the page, the filename will be
-    # changed to reflect the new format.
+    # changed to reflect the new format. If meta is already in the file,
+    # it will be preserved
     #
     # page   - The Stinker::Page to update.
     # name   - The String extension-less name of the page.
@@ -247,6 +271,7 @@ module Stinker
     def update_page(page, name, format, data, commit = {})
       name   ||= page.name
       format ||= page.format
+      meta   = page.meta_data
       dir      = ::File.dirname(page.path)
       dir      = '' if dir == '.'
       multi_commit = false
@@ -257,7 +282,8 @@ module Stinker
       else
         Committer.new(self, commit)
       end
-
+      
+      data = combine_data(data, meta)
       if page.name == name && page.format == format
         committer.add(page.path, normalize(data))
       else
@@ -273,6 +299,35 @@ module Stinker
 
       multi_commit ? committer : committer.commit
     end
+
+    # Public: Update an existing page with new content. The location of the
+    # page inside the repository will not change. If the given format is
+    # different than the current format of the page, the filename will be
+    # changed to reflect the new format.
+    #
+    # page   - The Stinker::Page to update.
+    # name   - The String extension-less name of the page.
+    # format - The Symbol format of the page.
+    # data   - The new String contents of the page.
+    # meta_data   - The Hash metadata, nil to wipe data
+    # commit - The commit Hash details:
+    #          :message   - The String commit message.
+    #          :name      - The String author full name.
+    #          :email     - The String email address.
+    #          :parent    - Optional Grit::Commit parent to this update.
+    #          :tree      - Optional String SHA of the tree to create the
+    #                       index from.
+    #          :committer - Optional Stinker::Committer instance.  If provided,
+    #                       assume that this operation is part of batch of 
+    #                       updates and the commit happens later.
+    #
+    # Returns the String SHA1 of the newly written version, or the 
+    # Stinker::Committer instance if this is part of a batch update.
+    def update_page_with_meta(page, name, format, data, meta_data, commit = {})
+      page.set_meta_data(meta_data)
+      update_page(page, name, format, data, commit)
+    end
+
 
     # Public: Delete a page.
     #
@@ -513,6 +568,18 @@ module Stinker
       ext = @page_class.format_to_ext(format)
       @page_class.cname(name) + '.' + ext
     end
+
+    # Combine meta data and data into a single string.
+    #
+    # data   - The String data of a file
+    # meta   - The Hash of meta data
+    #
+    # Returns the combined String, with meta in YAML attached to the top.
+    def combine_data(data, meta)
+      meta.empty? ? data : YAML.dump(meta) + "\n---\n" + data
+    end
+
+
 
     # Fill an array with a list of pages.
     #

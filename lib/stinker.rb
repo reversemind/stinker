@@ -1,26 +1,36 @@
 # stdlib
 require 'digest/md5'
 require 'ostruct'
+require 'yaml'
 
 # external
 require 'grit'
 require 'github/markup'
 require 'sanitize'
 
+unless Kernel.respond_to?(:require_relative)
+  module Kernel
+    def require_relative(path)
+      require File.join(File.dirname(caller[0]), path.to_str)
+    end
+  end
+end
+
+
 # internal
-require 'stinker/git_access'
-require 'stinker/committer'
-require 'stinker/pagination'
-require 'stinker/blob_entry'
-require 'stinker/site'
-require 'stinker/page'
-require 'stinker/file'
-require 'stinker/markup'
-require 'stinker/albino'
-require 'stinker/sanitization'
+require_relative 'stinker/git_access'
+require_relative 'stinker/committer'
+require_relative 'stinker/pagination'
+require_relative 'stinker/blob_entry'
+require_relative 'stinker/site'
+require_relative 'stinker/page'
+require_relative 'stinker/file'
+require_relative 'stinker/markup'
+require_relative 'stinker/albino'
+require_relative 'stinker/sanitization'
 
 module Stinker
-  VERSION = '0.0.1'
+  VERSION = '0.0.2'
 
   class Error < StandardError; end
 

@@ -22,6 +22,20 @@ context "Page" do
     assert_equal @wiki.repo.commits.first.id, page.version.id
   end
 
+  test "get existing page with meta" do
+    page = @wiki.page('Stinker')
+    assert_equal Stinker::Page, page.class
+    assert page.raw_data =~ /^---\ntitle: Gollum\n---\n# Stinker/
+    assert page.raw_text_data =~ /^# Stinker/
+    assert page.raw_meta_data =~ /^\ntitle: Gollum\n/
+    assert page.formatted_data =~ /<h1>Stinker<\/h1>\n\n<p>Samwise Gamgee/
+    assert_equal 'Stinker.md', page.path
+    assert_equal page.title, "Gollum"
+    assert_equal page.meta_data, {"title" => 'Gollum'}
+    assert_equal :markdown, page.format
+    assert_equal @wiki.repo.commits.first.id, page.version.id
+  end
+
   test "get existing page case insensitive" do
     assert_equal @wiki.page('Bilbo Baggins').path, @wiki.page('bilbo baggins').path
   end

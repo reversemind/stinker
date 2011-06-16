@@ -6,7 +6,7 @@ require 'mustache/sinatra'
 require 'stinker/frontend/views/layout'
 require 'stinker/frontend/views/editable'
 
-module Precious
+module MyPrecious
   class App < Sinatra::Base
     register Mustache::Sinatra
 
@@ -19,7 +19,7 @@ module Precious
 
     set :mustache, {
       # Tell mustache where the Views constant lives
-      :namespace => Precious,
+      :namespace => MyPrecious,
 
       # Mustache templates live here
       :templates => "#{dir}/templates",

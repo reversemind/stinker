@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Views
     class Edit < Layout
       include Editable

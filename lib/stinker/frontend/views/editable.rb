@@ -1,4 +1,4 @@
-module Precious
+module MyPrecious
   module Editable
     def formats(selected = @page.format)
       Stinker::Page::FORMAT_NAMES.map do |key, val|
