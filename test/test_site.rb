@@ -84,6 +84,10 @@ context "Site page previewing" do
     assert_equal "Test.md", page.filename
     assert_equal "Test", page.name
   end
+
+  test "site_config loaded" do
+    assert_equal({"site_name" => "Lord of the Rings"}, @wiki.site_config)
+  end
 end
 
 context "Wiki page writing" do
@@ -93,6 +97,8 @@ context "Wiki page writing" do
     Grit::Repo.init_bare(@path)
     @wiki = Stinker::Site.new(@path, {:content_types => {:page => [:title, :baz]}})
   end
+
+
 
   test "write_page" do
     cd = commit_details
@@ -131,6 +137,8 @@ context "Wiki page writing" do
   test "content_type meta" do
     assert_equal [:title, :baz], @wiki.content_types[:page]
   end
+
+  
 
   test "is not allowed to overwrite file" do
     @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)

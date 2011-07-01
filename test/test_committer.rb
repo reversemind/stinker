@@ -50,7 +50,7 @@ context "Site" do
   end
 
   test "parents with default master ref" do
-    ref = 'e530a4733b4c9ea561b769ad6832a1399e3994ea'
+    ref = 'b39a4b4015445e8588011d9951ae2e20e827c0f2'
     committer = Stinker::Committer.new(@wiki)
     assert_equal ref,  committer.parents.first.sha
   end

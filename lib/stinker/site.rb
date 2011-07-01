@@ -107,6 +107,9 @@ module Stinker
     # Gets the Hash of content types (which define meta).
     attr_reader :content_types
 
+    # Gets the Hash of site config
+    attr_reader :site_config
+
 
     # Public: Initialize a new Stinker Repo.
     #
@@ -141,6 +144,19 @@ module Stinker
       @history_sanitization = options[:history_sanitization] ||
         self.class.history_sanitization
       @content_types = options[:content_types] || {:page => []}
+      @site_config = load_config_file || {}
+      @access.clear
+  
+    end
+
+    # Public: figure out the config  if it exists.
+    # Returns a hash of the config
+    def load_config_file
+      conf_file = self.file('config.yaml')
+      conf_file ||= self.file('config.yml')
+      if conf_file
+        YAML.load(conf_file.raw_data)
+      end
     end
 
     # Public: check whether the site's git repo exists on the filesystem.
