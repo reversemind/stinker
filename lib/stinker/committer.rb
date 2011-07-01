@@ -123,7 +123,7 @@ module Stinker
     def update_working_dir(dir, name, format)
       unless @site.repo.bare
         if @site.page_file_dir
-          dir = dir.size.zero? ? @site.page_file_dir : File.join(dir, @site.page_file_dir)
+          dir = dir.size.zero? ? @site.page_file_dir : ::File.join(dir, @site.page_file_dir)
         end
 
         path =
