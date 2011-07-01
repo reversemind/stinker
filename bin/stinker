@@ -113,6 +113,7 @@ if options['irb']
 else
   require 'stinker/frontend/app'
   MyPrecious::App.set(:stinker_path, stinker_path)
+  wiki_options[:page_file_dir] ||= 'content'
   MyPrecious::App.set(:wiki_options, wiki_options)
 
   if cfg = options['config']
