@@ -44,8 +44,8 @@ module MyPrecious
 
     get '/edit/*' do
       @name = params[:splat].first
-      site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
-      if page = site.page(@name)
+      @site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
+      if page = @site.page(@name)
         @page = page
         @content = page.raw_data
         mustache :edit
