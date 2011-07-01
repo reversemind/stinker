@@ -103,6 +103,10 @@ module Stinker
 
     # Gets the String directory in which all page files reside.
     attr_reader :page_file_dir
+    
+    # Gets the Hash of content types (which define meta).
+    attr_reader :content_types
+
 
     # Public: Initialize a new Stinker Repo.
     #
@@ -126,16 +130,17 @@ module Stinker
       end
       @path          = path
       @page_file_dir = options[:page_file_dir]
-      @access        = options[:access]       || GitAccess.new(path, @page_file_dir)
-      @base_path     = options[:base_path]    || "/"
-      @page_class    = options[:page_class]   || self.class.page_class
-      @file_class    = options[:file_class]   || self.class.file_class
-      @markup_class  = options[:markup_class] || self.class.markup_class
+      @access        = options[:access]        || GitAccess.new(path, @page_file_dir)
+      @base_path     = options[:base_path]     || "/"
+      @page_class    = options[:page_class]    || self.class.page_class
+      @file_class    = options[:file_class]    || self.class.file_class
+      @markup_class  = options[:markup_class]  || self.class.markup_class
       @repo          = @access.repo
       @ref           = options[:ref] || self.class.default_ref
-      @sanitization  = options[:sanitization] || self.class.sanitization
+      @sanitization  = options[:sanitization]  || self.class.sanitization
       @history_sanitization = options[:history_sanitization] ||
         self.class.history_sanitization
+      @content_types = options[:content_types] || {:page => []}
     end
 
     # Public: check whether the site's git repo exists on the filesystem.
