@@ -7,8 +7,8 @@ context "Frontend" do
   setup do
     @path = cloned_testpath("examples/revert.git")
     @wiki = Stinker::Site.new(@path)
-    Precious::App.set(:stinker_path, @path)
-    Precious::App.set(:wiki_options, {})
+    MyPrecious::App.set(:stinker_path, @path)
+    MyPrecious::App.set(:wiki_options, {})
   end
 
   teardown do
@@ -139,6 +139,6 @@ context "Frontend" do
   end
 
   def app
-    Precious::App
+    MyPrecious::App
   end
 end
