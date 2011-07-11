@@ -134,7 +134,6 @@ module Stinker
       @path          = path
       @page_file_dir = options[:page_file_dir]
       @access        = options[:access]        || GitAccess.new(path, @page_file_dir)
-      @base_path     = options[:base_path]     || "/"
       @page_class    = options[:page_class]    || self.class.page_class
       @file_class    = options[:file_class]    || self.class.file_class
       @markup_class  = options[:markup_class]  || self.class.markup_class
@@ -143,8 +142,14 @@ module Stinker
       @sanitization  = options[:sanitization]  || self.class.sanitization
       @history_sanitization = options[:history_sanitization] ||
         self.class.history_sanitization
-      @content_types = options[:content_types] || {:page => []}
       @site_config = load_config_file || {}
+      if(@site_config["page_file_dir"] && !options[:page_file_dir] && !options[:access])
+        @page_file_dir = @site_config["page_file_dir"]
+        @access = GitAccess.new(path, @site_config["page_file_dir"])
+        @repo = @access.repo
+      end
+      @base_path     = options[:base_path]     || @site_config["base_path"] || "/"
+      @content_types = options[:content_types] || @site_config["content_types"] || {"page" => {}}
       @access.clear
   
     end

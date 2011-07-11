@@ -90,6 +90,21 @@ context "Site page previewing" do
   end
 end
 
+context "Site config" do
+   setup do
+    @path = testpath("examples/config.git")
+    @wiki = Stinker::Site.new(@path)
+  end
+
+  test "page_file_dir" do
+    assert_equal "content", @wiki.page_file_dir
+  end
+
+  test "content_types" do
+    assert_equal({"page" => {"subtitle" => 'text'}}, @wiki.content_types)
+  end
+end
+
 context "Wiki page writing" do
   setup do
     @path = testpath("examples/test.git")
