@@ -20,7 +20,31 @@ Stinker sites can be edited:
 By default, Stinker sites will be nanoc based, but should work well with
 Jekyll as well, since it has the same support for file metadata.
 
+(The only real difference between them for purposes of file access that
+stinker provides is where they place the files.)
 
+
+## MODIFICATIONS TO GOLLUM
+
+A list of modifications made from the standard Gollum that this is
+forked from:
+
+* Saving of metadata in page files with yaml - same way Jekyll and Nanoc
+  use it
+* Support for content types setting (content types will show meta data
+  fields in editor)
+* Loads some config variables from a config.yml (base_path,
+  page_file_dir)
+* Better support for subdirectories. There's not a global pagename
+  space any more, and creating a page named "foo/bar" will actually save
+  in the directory foo.
+* Sanitization turned off by default. It's assumed that contributers are trusted
+  enough to allow snippets of HTML. 
+* Extra wiki-ish formatting turned off (so feature set matches up better
+  with Jekyll/Nanoc - might be worth bringing [[page]] style links into
+  those projects and turning back on)
+
+  
 ## INSTALLATION
 
 The best way to install Stinker is with RubyGems:

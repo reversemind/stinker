@@ -30,7 +30,7 @@ require_relative 'stinker/albino'
 require_relative 'stinker/sanitization'
 
 module Stinker
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
 
   class Error < StandardError; end
 
