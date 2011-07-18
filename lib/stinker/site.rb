@@ -299,7 +299,8 @@ module Stinker
       format ||= page.format
       meta   = page.meta_data
       dir      = ::File.dirname(page.path)
-      dir      = '' if dir == '.'
+      # if name arg can be split on a slash then we let it define dir
+      dir      = '' if dir == '.' || name =~ /.*\/..*/
       multi_commit = false
 
       committer = if obj = commit[:committer]

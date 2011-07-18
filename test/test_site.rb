@@ -260,6 +260,22 @@ context "Wiki page writing" do
     assert_equal "h1. Gollum", @wiki.page("Smeagol").raw_data
   end
 
+  test "update page with name change and folder change" do
+    @wiki.write_page("Gollum", :markdown, "# Gollum", commit_details)
+
+    assert_equal :markdown, @wiki.page("Gollum").format
+
+    page = @wiki.page("Gollum")
+    @wiki.update_page(page, 'Foobar/Gollum', :markdown, "h1. Gollum", commit_details)
+    page = @wiki.page("Gollum")
+    @wiki.update_page(page, 'Baz/Smeagol', :markdown, "h1. Gollum", commit_details)
+    
+    page = @wiki.page("Smeagol")
+    assert_equal 3, @wiki.repo.commits.size
+    assert_equal "h1. Gollum", @wiki.page("Smeagol").raw_data
+    assert_equal 'Baz/Smeagol.md', page.path
+  end
+
   test "update page with name and format change" do
     @wiki.write_page("Gollum", :markdown, "# Gollum", commit_details)
 
