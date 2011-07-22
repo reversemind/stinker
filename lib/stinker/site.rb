@@ -178,6 +178,7 @@ module Stinker
     #
     # Returns a Stinker::Page or nil if no matching page was found.
     def page(name, version = @ref)
+      name = ::File.join(@page_file_dir, name) if(@page_file_dir)
       @page_class.new(self).find(name, version)
     end
 
@@ -237,15 +238,30 @@ module Stinker
       else
         Committer.new(self, commit)
       end
+      dir, name = split_dir_from_name(name)
 
-      committer.add_to_index('', name, format, data)
+      
+      committer.add_to_index(dir, name, format, data)
 
       committer.after_commit do |index, sha|
         @access.refresh
-        index.update_working_dir('', name, format)
+        index.update_working_dir(dir, name, format)
       end
 
       multi_commit ? committer : committer.commit
+    end
+
+    def split_dir_from_name(name)
+      dir = ''
+      if name =~ /\//
+        dir = ::File.dirname(name) 
+        dir = BlobEntry.normalize_dir(dir)
+        dir = dir.downcase if dir
+        dir = dir[1..-1] if dir =~ /^\//
+        name = ::File.basename(name)
+      end
+      dir = '' if dir == '.'
+      [dir, name]
     end
 
     # Public: Write a new version of a page to the Stinker repo root.
@@ -300,8 +316,10 @@ module Stinker
       meta   = page.meta_data
       dir      = ::File.dirname(page.path)
       # if name arg can be split on a slash then we let it define dir
-      dir      = '' if dir == '.' || name =~ /.*\/..*/
+      dir, name = split_dir_from_name(name) if name =~ /\//
+      dir      = '' if dir == '.' 
       multi_commit = false
+      
 
       committer = if obj = commit[:committer]
         multi_commit = true

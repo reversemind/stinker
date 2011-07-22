@@ -156,6 +156,7 @@ context "Wiki page writing" do
   
 
   test "is not allowed to overwrite file" do
+
     @wiki.write_page("Abc-Def", :markdown, "# Gollum", commit_details)
     @wiki.write_page("bob/dole", :markdown, "# Gollum", commit_details)
     assert_raises Stinker::DuplicatePageError do
@@ -165,13 +166,42 @@ context "Wiki page writing" do
       @wiki.write_page("bob/dole", :textile,  "# Gollum", commit_details)
     end
     assert_raises Stinker::DuplicatePageError do
+      @wiki.write_page("BOB/dole", :textile,  "# Gollum", commit_details)
+    end
+    assert_raises Stinker::DuplicatePageError do
       @wiki.write_page("/bob/dole", :textile,  "# Gollum", commit_details)
     end
     assert_nothing_raised do
-      @wiki.write_page("/BOB/dole", :textile,  "# Gollum", commit_details)
       @wiki.write_page("Dole", :textile,  "# Gollum", commit_details)
 
     end
+  end
+
+  test "is able do differentiate similar pages in nested dirs" do
+    @wiki.write_page("bar", :markdown, "# Gollum", commit_details)
+    assert_nothing_raised do
+      @wiki.write_page("foo/bar", :markdown, "# Gollum", commit_details)
+      @wiki.write_page("baz/bar", :markdown, "# Gollum", commit_details)
+    end
+
+    page3 = @wiki.page('bar').path
+    page1 = @wiki.page('foo/bar').path
+    page2 = @wiki.page('baz/bar').path
+    assert_not_equal page1, page2
+    assert_not_equal page2, page3
+    assert_not_equal page1, page3
+  end
+
+  test "is able to give nested dir in name if duplicates" do
+    @wiki.write_page("quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest1/quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest2/quux", :markdown, "# Gollum", commit_details)
+    page3 = @wiki.page('quux').name
+    page1 = @wiki.page('nest1/quux').name
+    page2 = @wiki.page('nest2/quux').name
+    assert_equal 'quux', page3
+    assert_equal 'nest1/quux', page1
+    assert_equal 'nest2/quux', page2
   end
 
   test "is allowed to have similar filenames if not in same dir" do
@@ -273,7 +303,7 @@ context "Wiki page writing" do
     page = @wiki.page("Smeagol")
     assert_equal 3, @wiki.repo.commits.size
     assert_equal "h1. Gollum", @wiki.page("Smeagol").raw_data
-    assert_equal 'Baz/Smeagol.md', page.path
+    assert_equal 'baz/Smeagol.md', page.path
   end
 
   test "update page with name and format change" do
@@ -402,10 +432,48 @@ context "page_file_dir option" do
   end
 
   test "write a page in sub directory" do
+    assert_equal @page_file_dir, @wiki.page_file_dir
     @wiki.write_page("New Page", :markdown, "Hi", commit_details)
     assert_equal "Hi", File.read(File.join(@path, @page_file_dir, "New-Page.md"))
     assert !File.exist?(File.join(@path, "New-Page.md"))
   end
+
+  test "write a page in nested sub directory" do
+    @wiki.write_page("Foo/TestNestPage", :markdown, "Hi", commit_details)
+    assert !File.exist?(File.join(@path, "TestNestPage.md"))
+    assert !File.exist?(File.join(@path, 'foo', "TestNestPage.md"))
+    assert_equal "Hi", File.read(File.join(@path, @page_file_dir, 'foo', "TestNestPage.md"))
+  end
+
+  test "is able differentiate similar pages in nested dirs" do
+    @wiki.write_page("quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest1/quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest2/quux", :markdown, "# Gollum", commit_details)
+
+    page1 = @wiki.page('nest1/quux').path
+    page2 = @wiki.page('nest2/quux').path
+    page3 = @wiki.page('quux').path
+    assert_not_equal page1, page2
+    assert_not_equal page2, page3
+    assert_not_equal page1, page3
+
+    
+  end
+
+  test "is able to give nested dir in name if duplicates" do
+    @wiki.write_page("quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest1/quux", :markdown, "# Gollum", commit_details)
+    @wiki.write_page("nest2/quux", :markdown, "# Gollum", commit_details)
+    page1 = @wiki.page('nest1/quux').name
+    page2 = @wiki.page('nest2/quux').name
+    page3 = @wiki.page('quux').name
+    assert_equal 'nest1/quux', page1
+    assert_equal 'nest2/quux', page2
+    assert_equal 'quux', page3
+
+    
+  end
+
 
   test "a file in page file dir should be found" do
     assert @wiki.page("foo")

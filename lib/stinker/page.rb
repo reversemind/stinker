@@ -105,7 +105,10 @@ module Stinker
     #
     # Returns the String name.
     def name
-      self.class.canonicalize_filename(filename)
+      testname = self.class.canonicalize_filename(filename)
+      dup_page = @site.page(testname)
+      return testname unless dup_page && dup_page.path != path
+      path.split('.')[0..-2].join('.').gsub(/^#{@site.page_file_dir}\//, '')
     end
 
     # Public: If the meta data includes a title, it is used. If the
@@ -391,24 +394,26 @@ module Stinker
         checked_dir.downcase!
       end
       if checked_dir.nil? && name =~ /\//
-        paths = name.split('/')
-        new_name = paths.pop
-        dir_check = paths.join('/')
+        dir_check, new_name = @site.split_dir_from_name(name)
+        
         checked_dir = BlobEntry.normalize_dir(dir_check) unless dir_check.empty?
         if checked_dir
           checked_dir.downcase!
           name = new_name
         end
       end
-
+      
+      matched = nil
       map.each do |entry|
         next if entry.name.to_s.empty?
         next unless checked_dir.nil? || entry.dir.downcase == checked_dir
         next unless page_match(name, entry.name)
-        return entry.page(@site, @version)
+        page = entry.page(@site, @version)
+        matched ||= page
+        matched = page if matched.path.length >= page.path.length
       end
-
-      return nil # nothing was found
+      
+      return matched
     end
 
     # Populate the Page with information from the Blob.

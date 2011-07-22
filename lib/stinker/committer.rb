@@ -85,12 +85,6 @@ module Stinker
     # Returns nothing (modifies the Index in place).
     def add_to_index(dir, name, format, data, allow_same_ext = false)
       path = @site.page_file_name(name, format)
-      if dir.strip.empty? && path =~ /\//
-        path_parts = path.split('/')
-        path = path_parts.pop
-        path_parts.shift if path_parts.first.empty?
-        dir = path_parts.join('/')
-      end
       dir = '/' if dir.strip.empty?
 
       fullpath = ::File.join(*[@site.page_file_dir, dir, path].compact)
@@ -123,7 +117,7 @@ module Stinker
     def update_working_dir(dir, name, format)
       unless @site.repo.bare
         if @site.page_file_dir
-          dir = dir.size.zero? ? @site.page_file_dir : ::File.join(dir, @site.page_file_dir)
+          dir = dir.size.zero? ? @site.page_file_dir : ::File.join(@site.page_file_dir, dir)
         end
 
         path =
