@@ -108,6 +108,14 @@ module Stinker
       testname = self.class.canonicalize_filename(filename)
       dup_page = @site.page(testname)
       return testname unless dup_page && dup_page.path != path
+      fullname
+    end
+
+    # Public: The page filename without extension, but with
+    # nested directory if it exists.
+    #
+    # Returns the String name.
+    def fullname
       path.split('.')[0..-2].join('.').gsub(/^#{@site.page_file_dir}\//, '')
     end
 
