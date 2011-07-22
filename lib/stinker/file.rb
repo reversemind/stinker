@@ -1,6 +1,7 @@
 module Stinker
   class File
     Site.file_class = self
+    ASSET_EXTS = %w(jpg jpeg png pdf doc zip gif)
 
     # Public: Initialize a file.
     #
@@ -18,6 +19,14 @@ module Stinker
     # Returns the String name.
     def name
       @blob && @blob.name
+    end
+
+    # Public: Checks if the file is an asset
+    #
+    # Returns true if so
+    def asset?
+      list = @site.asset_extensions || ASSET_EXTS
+      list.include?(::File.extname(@blob.name)) || list.include?(::File.extname(@blob.name).gsub(/^\./, ''))
     end
 
     # Public: The raw contents of the page.

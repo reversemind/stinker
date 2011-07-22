@@ -4,7 +4,7 @@ require File.expand_path(path)
 
 context "File" do
   setup do
-    @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
+    @wiki = Stinker::Site.new(testpath("examples/lotr.git"), :asset_extensions => %w(csv jpg))
     @path = cloned_testpath("examples/lotr")
     @mordor = Stinker::Site.new(@path, :asset_file_dir => 'Mordor')
   end
@@ -30,6 +30,13 @@ context "File" do
   test "file list" do
     assert_equal ["Data.csv", "Mordor/eye.jpg", "Mordor/todo.txt"], @wiki.files.map(&:path)
     assert_equal ["Mordor/eye.jpg", "Mordor/todo.txt"], @mordor.files.map(&:path)
+  end
+
+  test "asset list" do
+    assert @wiki.assets.first.asset?
+
+    assert_equal ["Data.csv", "Mordor/eye.jpg"], @wiki.assets.map(&:path)
+    assert_equal ["Mordor/eye.jpg"], @mordor.assets.map(&:path)
   end
 
   test "can delete" do

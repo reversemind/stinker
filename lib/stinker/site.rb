@@ -107,6 +107,10 @@ module Stinker
     # Gets the String directory in which all asset files reside.
     # This dir will be used to filter the @site.files call
     attr_reader :asset_file_dir
+
+    # Gets the list of allowable extensions for assets
+    attr_reader :asset_extensions
+
     
     # Gets the Hash of content types (which define meta).
     attr_reader :content_types
@@ -156,6 +160,7 @@ module Stinker
       @base_path     = options[:base_path]     || @site_config["base_path"] || "/"
       @content_types = options[:content_types] || @site_config["content_types"] || {"page" => {}}
       @asset_file_dir= options[:asset_file_dir] || @site_config["asset_file_dir"]
+      @asset_extensions= options[:asset_extensions] || @site_config["asset_extensions"]
       @access.clear
     end
 
@@ -550,6 +555,19 @@ module Stinker
       file_tree_list(treeish || @ref)
     end
 
+    # Public: Lists all assets for this site (files you actually
+    # want to be editable - by whitelisted extension)
+    #
+    # treeish - The String commit ID or ref to find  (default:  @ref)
+    #
+    # Returns an Array of Stinker::File instances.
+    def assets(treeish = nil)
+      file_tree_list(treeish || @ref, true)
+    end
+
+
+
+
     # Public: Returns the number of pages accessible from a commit
     #
     # ref - A String ref that is either a commit SHA or references one.
@@ -698,14 +716,16 @@ module Stinker
     # ref - A String ref that is either a commit SHA or references one.
     #
     # Returns a flat Array of Stinker::File instances.
-    def file_tree_list(ref)
+    def file_tree_list(ref, assets_only = false)
       sha    = @access.ref_to_sha(ref)
       commit = @access.commit(sha)
       tree_map_for(sha).inject([]) do |list, entry|
         next list if @page_class.valid_filename?(entry.name)
         next list if entry.name =~ /config\.ya?ml/
         next list unless !asset_file_dir || (entry.dir =~ /^\/?#{asset_file_dir}/)
-        list << entry.file(self, commit)
+        my_file = entry.file(self, commit)
+        next list unless !assets_only || my_file.asset?
+        list << my_file
       end
     end
 
