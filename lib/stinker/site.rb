@@ -155,7 +155,7 @@ module Stinker
       end
       @base_path     = options[:base_path]     || @site_config["base_path"] || "/"
       @content_types = options[:content_types] || @site_config["content_types"] || {"page" => {}}
-      @assets_file_dir= options[:assets_file_dir] || @site_config["asset_file_dir"]
+      @asset_file_dir= options[:asset_file_dir] || @site_config["asset_file_dir"]
       @access.clear
     end
 
@@ -704,7 +704,7 @@ module Stinker
       tree_map_for(sha).inject([]) do |list, entry|
         next list if @page_class.valid_filename?(entry.name)
         next list if entry.name =~ /config\.ya?ml/
-        next list unless !@assets_file_dir || (entry.dir =~ /^\/?#{@assets_file_dir}/)
+        next list unless !asset_file_dir || (entry.dir =~ /^\/?#{asset_file_dir}/)
         list << entry.file(self, commit)
       end
     end

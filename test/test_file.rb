@@ -6,7 +6,7 @@ context "File" do
   setup do
     @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
     @path = cloned_testpath("examples/lotr")
-    @mordor = Stinker::Site.new(@path, :assets_file_dir => 'Mordor')
+    @mordor = Stinker::Site.new(@path, :asset_file_dir => 'Mordor')
   end
 
   test "new file" do
