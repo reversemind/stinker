@@ -48,6 +48,18 @@ context "File" do
     assert !File.exist?(File.join(@path, @file.path))
   end
 
+  test "can add" do
+    assert_equal 2, @mordor.files.size
+    @file = @mordor.file('Mordor/eye.jpg')
+    @mordor.write_file('newfile.jpg', @file.raw_data, {:name => 'Test', :email => 'test', :message => 'adding'})
+    @new_file =  @mordor.file('Mordor/newfile.jpg')
+    assert_not_equal nil, @new_file
+    assert File.exist?(File.join(@path, @new_file.path))
+    assert_equal 3,@mordor.files.size
+    assert_equal @file.raw_data, @new_file.raw_data
+  end
+
+
   teardown do
     FileUtils.rm_r(@path)
   end

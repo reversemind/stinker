@@ -261,6 +261,44 @@ module Stinker
       multi_commit ? committer : committer.commit
     end
 
+
+    # Public: Write a new version of a file to the Stinker repo root.
+    #
+    # name   - The String name of the file.
+    # data   - The new String contents of the file.
+    # commit - The commit Hash details:
+    #          :message   - The String commit message.
+    #          :name      - The String author full name.
+    #          :email     - The String email address.
+    #          :parent    - Optional Grit::Commit parent to this update.
+    #          :tree      - Optional String SHA of the tree to create the
+    #                       index from.
+    #          :committer - Optional Stinker::Committer instance.  If provided,
+    #                       assume that this operation is part of batch of 
+    #                       updates and the commit happens later.
+    #
+    # Returns the String SHA1 of the newly written version, or the 
+    # Stinker::Committer instance if this is part of a batch update.
+    def write_file(name, data, commit = {})
+      multi_commit = false
+
+      committer = if obj = commit[:committer]
+        multi_commit = true
+        obj
+      else
+        Committer.new(self, commit)
+      end
+      
+      committer.add_to_index('', name, nil, data)
+
+      committer.after_commit do |index, sha|
+        @access.refresh
+        index.update_working_dir('', name, nil)
+      end
+
+      multi_commit ? committer : committer.commit
+    end
+
     def split_dir_from_name(name)
       dir = ''
       if name =~ /\//
@@ -456,7 +494,7 @@ module Stinker
         dir = '' if dir == '.'
 
         @access.refresh
-        index.update_working_dir(dir, file.name)
+        index.update_working_dir(dir, file.name, nil, true)
       end
 
       multi_commit ? committer : committer.commit

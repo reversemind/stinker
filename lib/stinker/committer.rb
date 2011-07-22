@@ -84,10 +84,11 @@ module Stinker
     #
     # Returns nothing (modifies the Index in place).
     def add_to_index(dir, name, format, data, allow_same_ext = false)
-      path = @site.page_file_name(name, format)
+      path = format.nil? ?  name : @site.page_file_name(name, format)
       dir = '/' if dir.strip.empty?
-
-      fullpath = ::File.join(*[@site.page_file_dir, dir, path].compact)
+      
+      extra = (format.nil? ? @site.asset_file_dir : @site.page_file_dir)
+      fullpath = ::File.join(*[extra, dir, path].compact)
       fullpath = fullpath[1..-1] if fullpath =~ /^\//
 
       if index.current_tree && tree = index.current_tree / dir
@@ -103,7 +104,7 @@ module Stinker
         end
       end
 
-      index.add(fullpath, @site.normalize(data))
+      index.add(fullpath, (format.nil? ? data : @site.normalize(data)))
     end
 
     # Update the given file in the repository's working directory if there
@@ -112,19 +113,23 @@ module Stinker
     # dir    - The String directory in which the file lives.
     # name   - The String name of the page (may be in human format).
     # format - The Symbol format of the page.
+    # ignore_dirs - Ignore the page/asset file dirs for the purposes of update
     #
     # Returns nothing.
-    def update_working_dir(dir, name, format = nil)
+    def update_working_dir(dir, name, format = nil, ignore_dirs = false)
       unless @site.repo.bare
-        if @site.page_file_dir
+        if @site.page_file_dir && format
           dir = dir.size.zero? ? @site.page_file_dir : ::File.join(@site.page_file_dir, dir)
+        elsif @site.asset_file_dir && format.nil? && !ignore_dirs
+          dir = dir.size.zero? ? @site.asset_file_dir : ::File.join(@site.asset_file_dir, dir)
         end
+        
 
         path =
           if dir == ''
             format.nil? ? name : @site.page_file_name(name, format)
           else
-            format.nil? ?  ::File.join(dir, name) : ::File.join(dir, @site.page_file_name(name, format))
+            format.nil? ? ::File.join(dir, name) : ::File.join(dir, @site.page_file_name(name, format))
           end
 
         Dir.chdir(::File.join(@site.repo.path, '..')) do
