@@ -29,7 +29,7 @@ context "File" do
 
   test "file list" do
     assert_equal ["Data.csv", "Mordor/eye.jpg", "Mordor/todo.txt"], @wiki.files.map(&:path)
-    assert_equal ["Mordor/eye.jpg", "Mordor/todo.txt"], @mordor.files.map(&:path)
+    assert_equal ["Mordor/eye.jpg"], @mordor.assets.map(&:path)
   end
 
   test "asset list" do
@@ -40,22 +40,22 @@ context "File" do
   end
 
   test "can delete" do
-    @file = @mordor.files.first
+    @file = @mordor.file('Mordor/eye.jpg')
     assert File.exist?(File.join(@path, @file.path))
     @mordor.delete_file(@file, {:name => 'Test', :email => 'test', :message => 'deleting'})
 
-    assert_equal 1, @mordor.files.size
+    assert_equal 0, @mordor.assets.size
     assert !File.exist?(File.join(@path, @file.path))
   end
 
   test "can add" do
-    assert_equal 2, @mordor.files.size
+    assert_equal 1, @mordor.assets.size
     @file = @mordor.file('Mordor/eye.jpg')
     @mordor.write_file('newfile.jpg', @file.raw_data, {:name => 'Test', :email => 'test', :message => 'adding'})
     @new_file =  @mordor.file('Mordor/newfile.jpg')
     assert_not_equal nil, @new_file
-    assert File.exist?(File.join(@path, @new_file.path))
-    assert_equal 3,@mordor.files.size
+    assert File.exist?(File.join(@path, 'Mordor', @new_file.name))
+    assert_equal 2,@mordor.assets.size
     assert_equal @file.raw_data, @new_file.raw_data
   end
 

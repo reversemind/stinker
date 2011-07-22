@@ -141,7 +141,6 @@ module Stinker
       end
       @path          = path
       @page_file_dir = options[:page_file_dir]
-      @asset_file_dir= options[:assets_file_dir]
       @access        = options[:access]        || GitAccess.new(path, @page_file_dir)
       @page_class    = options[:page_class]    || self.class.page_class
       @file_class    = options[:file_class]    || self.class.file_class
@@ -159,8 +158,8 @@ module Stinker
       end
       @base_path     = options[:base_path]     || @site_config["base_path"] || "/"
       @content_types = options[:content_types] || @site_config["content_types"] || {"page" => {}}
-      @asset_file_dir= options[:asset_file_dir] || @site_config["asset_file_dir"]
-      @asset_extensions= options[:asset_extensions] || @site_config["asset_extensions"]
+      @asset_file_dir = options[:asset_file_dir] || @site_config["asset_file_dir"]
+      @asset_extensions = options[:asset_extensions] || @site_config["asset_extensions"]
       @access.clear
     end
 
@@ -760,7 +759,7 @@ module Stinker
       tree_map_for(sha).inject([]) do |list, entry|
         next list if @page_class.valid_filename?(entry.name)
         next list if entry.name =~ /config\.ya?ml/
-        next list unless !asset_file_dir || (entry.dir =~ /^\/?#{asset_file_dir}/)
+        next list unless !assets_only || !asset_file_dir || (entry.dir =~ /^\/?#{asset_file_dir}/)
         my_file = entry.file(self, commit)
         next list unless !assets_only || my_file.asset?
         list << my_file
