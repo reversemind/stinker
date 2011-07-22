@@ -114,7 +114,7 @@ module Stinker
     # format - The Symbol format of the page.
     #
     # Returns nothing.
-    def update_working_dir(dir, name, format)
+    def update_working_dir(dir, name, format = nil)
       unless @site.repo.bare
         if @site.page_file_dir
           dir = dir.size.zero? ? @site.page_file_dir : ::File.join(@site.page_file_dir, dir)
@@ -122,9 +122,9 @@ module Stinker
 
         path =
           if dir == ''
-            @site.page_file_name(name, format)
+            format.nil? ? name : @site.page_file_name(name, format)
           else
-            ::File.join(dir, @site.page_file_name(name, format))
+            format.nil? ?  ::File.join(dir, name) : ::File.join(dir, @site.page_file_name(name, format))
           end
 
         Dir.chdir(::File.join(@site.repo.path, '..')) do

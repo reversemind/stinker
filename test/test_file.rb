@@ -5,7 +5,8 @@ require File.expand_path(path)
 context "File" do
   setup do
     @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
-    @mordor = Stinker::Site.new(testpath("examples/lotr.git"), :assets_file_dir => 'Mordor')
+    @path = cloned_testpath("examples/lotr.git")
+    @mordor = Stinker::Site.new(@path, :assets_file_dir => 'Mordor')
   end
 
   test "new file" do
@@ -34,6 +35,8 @@ context "File" do
   test "can delete" do
     @file = @mordor.files.first
     @mordor.delete_file(@file, {:name => 'Test', :email => 'test', :message => 'deleting'})
+
     assert_equal 1, @mordor.files.size
+    assert !File.exist?(File.join(@path, @file.path))
   end
 end
