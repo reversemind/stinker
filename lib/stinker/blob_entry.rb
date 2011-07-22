@@ -48,6 +48,17 @@ module Stinker
       page
     end
 
+    # Gets a File instance for this blob.
+    #
+    # site - Stinker::Site instance for the Stinker::Page
+    #
+    # Returns a Stinker::File instance.
+    def file(site, commit)
+      blob = self.blob(site.repo)
+      file = site.file_class.new(site).populate(blob, commit, self.dir)
+      file
+    end
+
     def inspect
       %(#<Stinker::BlobEntry #{@sha} #{@path}>)
     end

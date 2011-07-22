@@ -5,6 +5,7 @@ require File.expand_path(path)
 context "File" do
   setup do
     @wiki = Stinker::Site.new(testpath("examples/lotr.git"))
+    @mordor = Stinker::Site.new(testpath("examples/lotr.git"), :assets_file_dir => 'Mordor')
   end
 
   test "new file" do
@@ -23,5 +24,10 @@ context "File" do
 
   test "accessing tree" do
     assert_nil @wiki.file("Mordor")
+  end
+
+  test "file list" do
+    assert_equal ["Data.csv", "Mordor/eye.jpg", "Mordor/todo.txt"], @wiki.files.map(&:path)
+    assert_equal ["Mordor/eye.jpg", "Mordor/todo.txt"], @mordor.files.map(&:path)
   end
 end

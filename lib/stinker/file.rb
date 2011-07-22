@@ -60,5 +60,18 @@ module Stinker
         self
       end
     end
+
+    # Populate the File with information from the Blob.
+    #
+    # blob - The Grit::Blob that contains the info.
+    # path - The String directory path of the file.
+    #
+    # Returns the populated Stinker::File.
+    def populate(blob, version, path=nil)
+      @blob = blob
+      @path = "#{path}/#{blob.name}"[1..-1]
+      @version = version
+      self
+    end
   end
 end
