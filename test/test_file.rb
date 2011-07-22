@@ -30,4 +30,10 @@ context "File" do
     assert_equal ["Data.csv", "Mordor/eye.jpg", "Mordor/todo.txt"], @wiki.files.map(&:path)
     assert_equal ["Mordor/eye.jpg", "Mordor/todo.txt"], @mordor.files.map(&:path)
   end
+
+  test "can delete" do
+    @file = @mordor.files.first
+    @mordor.delete_file(@file, {:name => 'Test', :email => 'test', :message => 'deleting'})
+    assert_equal 1, @mordor.files.size
+  end
 end

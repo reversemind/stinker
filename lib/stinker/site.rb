@@ -418,6 +418,45 @@ module Stinker
       multi_commit ? committer : committer.commit
     end
 
+    # Public: Delete a file.
+    #
+    # file   - The Stinker::File to delete.
+    # commit - The commit Hash details:
+    #          :message   - The String commit message.
+    #          :name      - The String author full name.
+    #          :email     - The String email address.
+    #          :parent    - Optional Grit::Commit parent to this update.
+    #          :tree      - Optional String SHA of the tree to create the
+    #                       index from.
+    #          :committer - Optional Stinker::Committer instance.  If provided,
+    #                       assume that this operation is part of batch of 
+    #                       updates and the commit happens later.
+    #
+    # Returns the String SHA1 of the newly written version, or the 
+    # Stinker::Committer instance if this is part of a batch update.
+    def delete_file(file, commit)
+      multi_commit = false
+
+      committer = if obj = commit[:committer]
+        multi_commit = true
+        obj
+      else
+        Committer.new(self, commit)
+      end
+
+      committer.delete(file.path)
+
+      committer.after_commit do |index, sha|
+        dir = ::File.dirname(file.path)
+        dir = '' if dir == '.'
+
+        @access.refresh
+        index.update_working_dir(dir, file.name)
+      end
+
+      multi_commit ? committer : committer.commit
+    end
+
     # Public: Applies a reverse diff for a given page.  If only 1 SHA is given,
     # the reverse diff will be taken from its parent (^SHA...SHA).  If two SHAs
     # are given, the reverse diff is taken from SHA1...SHA2.
