@@ -414,7 +414,7 @@ module Stinker
       matched = nil
       map.each do |entry|
         next if entry.name.to_s.empty?
-        next unless checked_dir.nil? || entry.dir.downcase == checked_dir
+        next unless checked_dir.nil? || entry.dir.downcase.match(/^#{checked_dir}/)
         next unless page_match(name, entry.name)
         page = entry.page(@site, @version)
         matched ||= page

@@ -86,8 +86,13 @@ module Stinker
     def add_to_index(dir, name, format, data, allow_same_ext = false)
       path = format.nil? ?  name : @site.page_file_name(name, format)
       dir = '/' if dir.strip.empty?
+      extra = nil
+      if format.nil? && !(dir =~ /^\/?#{@site.asset_file_dir}/)
+        extra = @site.asset_file_dir
+      elsif !format.nil? && !(dir =~ /^\/?#{@site.page_file_dir}/)
+        extra = @site.page_file_dir
+      end
       
-      extra = (format.nil? ? @site.asset_file_dir : @site.page_file_dir)
       fullpath = ::File.join(*[extra, dir, path].compact)
       fullpath = fullpath[1..-1] if fullpath =~ /^\//
 

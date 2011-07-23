@@ -445,6 +445,26 @@ context "page_file_dir option" do
     assert_equal "Hi", File.read(File.join(@path, @page_file_dir, 'foo', "TestNestPage.md"))
   end
 
+  test "update page with nesting change" do
+    @wiki.write_page("Gollum", :markdown, "# Gollum", commit_details)
+    page = @wiki.page("Gollum")
+    assert_equal File.join(@page_file_dir, 'Gollum.md'), page.path
+    assert_equal 'Gollum', page.name
+    @wiki.update_page(page, 'Foobar/Gollum', :markdown, "h1. Gollum", commit_details)
+    page = @wiki.page("Gollum")
+    assert_equal 2, @wiki.pages.size
+    assert_equal File.join(@page_file_dir, 'foobar', 'Gollum.md'), page.path
+    @wiki.update_page(page, 'Smeagol', :markdown, "h1. Gollum", commit_details)
+    page = @wiki.page("Smeagol")
+    assert_equal 2, @wiki.pages.size
+    assert_equal File.join(@page_file_dir, 'foobar', 'Smeagol.md'), page.path
+    @wiki.update_page(page, '/Smeagol', :markdown, "h1. Gollum", commit_details)
+    page = @wiki.page("Smeagol")
+    assert_equal 2, @wiki.pages.size
+    assert_equal File.join(@page_file_dir, 'Smeagol.md'), page.path
+    
+  end
+
   test "is able differentiate similar pages in nested dirs" do
     @wiki.write_page("quux", :markdown, "# Gollum", commit_details)
     @wiki.write_page("nest1/quux", :markdown, "# Gollum", commit_details)

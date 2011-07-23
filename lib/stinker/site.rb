@@ -361,7 +361,7 @@ module Stinker
       name   ||= page.name
       format ||= page.format
       meta   = page.meta_data
-      dir      = ::File.dirname(page.path)
+      prev_dir = dir = ::File.dirname(page.path)
       # if name arg can be split on a slash then we let it define dir
       dir, name = split_dir_from_name(name) if name =~ /\//
       dir      = '' if dir == '.' 
@@ -376,7 +376,7 @@ module Stinker
       end
       
       data = combine_data(data, meta)
-      if page.name == name && page.format == format
+      if page.name == name && dir == prev_dir && page.format == format
         committer.add(page.path, normalize(data))
       else
         committer.delete(page.path)
@@ -386,6 +386,7 @@ module Stinker
       committer.after_commit do |index, sha|
         @access.refresh
         index.update_working_dir(dir, page.name, page.format)
+        index.update_working_dir(prev_dir, page.name, page.format)
         index.update_working_dir(dir, name, format)
       end
 
