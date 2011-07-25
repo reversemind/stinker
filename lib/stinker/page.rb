@@ -232,7 +232,8 @@ module Stinker
     #
     # meta - A Hash of metadata
     def set_meta_data(meta)
-      @meta = meta
+      @meta ||= {}
+      @meta = @meta.merge(meta)
     end
 
     # Public: Metadata as extracted from the file

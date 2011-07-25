@@ -134,9 +134,6 @@ context "Wiki page writing" do
     cd = commit_details
     @wiki.write_page_with_meta("Gollum", :markdown, "# Gollum", {'title' => 'foobar'}, cd)
     assert_equal 1, @wiki.repo.commits.size
-    assert_equal cd[:message], @wiki.repo.commits.first.message
-    assert_equal cd[:name], @wiki.repo.commits.first.author.name
-    assert_equal cd[:email], @wiki.repo.commits.first.author.email
     assert @wiki.page("Gollum")
     assert_equal "foobar", @wiki.page("Gollum").title
 
@@ -240,10 +237,7 @@ context "Wiki page writing" do
     page = @wiki.page("Gollum")
     assert_equal 2, @wiki.repo.commits.size
     assert_equal "# Gollum2", @wiki.page("Gollum").raw_text_data
-    assert_equal cd[:message], @wiki.repo.commits.first.message
-    assert_equal cd[:name], @wiki.repo.commits.first.author.name
-    assert_equal cd[:email], @wiki.repo.commits.first.author.email
-    assert_equal new_meta, page.meta_data
+    assert_equal meta.merge(new_meta), page.meta_data
   end
 
   test "update_page preserves meta if exists " do
