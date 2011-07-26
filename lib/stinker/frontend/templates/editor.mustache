@@ -8,10 +8,10 @@
   </select>
 </div>
 {{#is_create_page}}
-<form name="gollum-editor" action="/create" method="post">
+<form name="gollum-editor" action="{{root_url}}/create" method="post">
 {{/is_create_page}}
 {{#is_edit_page}}
-<form name="gollum-editor" action="/edit/{{escaped_name}}" method="post">
+<form name="gollum-editor" action="{{root_url}}/edit/{{escaped_name}}" method="post">
 {{/is_edit_page}}
   <fieldset id="gollum-editor-fields">
   <div id="gollum-editor-title-field" class="singleline">
