@@ -167,6 +167,7 @@ module Stinker
     #
     # Returns true if the site has a Rules file.
     def nanoc?
+      return true if @site_config["nanoc"]
       self.file('Rules').nil? ? false : true
     end
 
