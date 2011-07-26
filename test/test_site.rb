@@ -10,6 +10,10 @@ context "Site" do
     assert_equal testpath("examples/lotr.git"), @wiki.path
   end
 
+  test "detect not nanoc" do
+    assert_equal false, @wiki.nanoc?
+  end
+
   test "git repo" do
     assert_equal Grit::Repo, @wiki.repo.class
     assert @wiki.exist?
@@ -113,6 +117,11 @@ context "Wiki page writing" do
     @wiki = Stinker::Site.new(@path, {:content_types => {:page => [:title, :baz]}})
   end
 
+  test "detect nanoc" do
+    assert_equal false, @wiki.nanoc?
+    @wiki.write_file('Rules', '', commit_details)
+    assert_equal true, @wiki.nanoc?
+  end
 
 
   test "write_page" do

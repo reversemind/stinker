@@ -162,6 +162,14 @@ module Stinker
       @asset_extensions = options[:asset_extensions] || @site_config["asset_extensions"]
       @access.clear
     end
+    
+    # Public: check if the site is a nanoc3 site.
+    #
+    # Returns true if the site has a Rules file.
+    def nanoc?
+      self.file('Rules').nil? ? false : true
+    end
+
 
     # Public: figure out the config  if it exists.
     # Returns a hash of the config
