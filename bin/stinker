@@ -121,6 +121,7 @@ else
 
   site = Stinker::Site.new(stinker_path, wiki_options)
   adapter = if site.nanoc?
+    require 'stinker/frontend/adapters/nanoc'
     :nanoc
   else
     :passthrough

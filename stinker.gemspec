@@ -53,6 +53,8 @@ Gem::Specification.new do |s|
     lib/stinker/blob_entry.rb
     lib/stinker/committer.rb
     lib/stinker/file.rb
+    lib/stinker/frontend/adapter.rb
+    lib/stinker/frontend/adapters/nanoc.rb
     lib/stinker/frontend/app.rb
     lib/stinker/frontend/public/css/dialog.css
     lib/stinker/frontend/public/css/editor.css
