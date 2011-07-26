@@ -4,6 +4,7 @@ module MyPrecious
   module Adapters
     class Nanoc
       def self.build
+        puts "Detected Nanoc site (saw a Rules file)"
         MyPrecious::App.set(:root_url, '/_stinker')
         autocompiler = Nanoc::Extra::AutoCompiler.new('.')
         app = Rack::Builder.new do
