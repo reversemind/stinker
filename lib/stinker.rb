@@ -4,10 +4,10 @@ require 'ostruct'
 require 'yaml'
 
 # external
+require 'nanoc3'
 require 'grit'
 require 'github/markup'
 require 'sanitize'
-require 'nanoc3'
 
 unless Kernel.respond_to?(:require_relative)
   module Kernel
@@ -31,7 +31,7 @@ require_relative 'stinker/albino'
 require_relative 'stinker/sanitization'
 
 module Stinker
-  VERSION = '0.0.4'
+  VERSION = '0.0.5'
 
   class Error < StandardError; end
 

@@ -6,7 +6,7 @@ module MyPrecious
       include Rack::Utils
       alias_method :h, :escape_html
 
-      attr_reader :name
+      attr_reader :name, :root_url
 
       def escaped_name
         CGI.escape(@name)
@@ -15,6 +15,7 @@ module MyPrecious
       def title
         "Home"
       end
+
     end
   end
 end

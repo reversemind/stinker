@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
+require 'optparse'
+require 'rubygems'
 
-$:.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
+# $:.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
+require 'stinker'
 
 help = <<HELP
 Stinker is a multi-format Site Engine/API/Frontend.
@@ -13,9 +16,7 @@ Basic Command Line Usage:
 Options:
 HELP
 
-require 'optparse'
-require 'rubygems'
-require 'stinker'
+
 
 exec = {}
 options = { 'port' => 4567, 'bind' => '0.0.0.0' }

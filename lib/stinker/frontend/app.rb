@@ -16,6 +16,7 @@ module MyPrecious
 
     set :public,    "#{dir}/public"
     set :static,    true
+    set :root_url, ''
 
     set :mustache, {
       # Tell mustache where the Views constant lives
@@ -36,6 +37,10 @@ module MyPrecious
 
     configure :test do
       enable :logging, :raise_errors, :dump_errors
+    end
+
+    before do
+      @root_url = settings.root_url
     end
 
     get '/' do
