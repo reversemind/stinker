@@ -7,6 +7,7 @@ require 'yaml'
 require 'grit'
 require 'github/markup'
 require 'sanitize'
+require 'nanoc3'
 
 unless Kernel.respond_to?(:require_relative)
   module Kernel

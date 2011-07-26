@@ -1,4 +1,3 @@
-require 'nanoc'
 
 module MyPrecious
   module Adapters
