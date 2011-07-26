@@ -47,7 +47,7 @@ module MyPrecious
       @site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
       if page = @site.page(@name)
         @page = page
-        @content = page.raw_data
+        @content = page.raw_text_data
         mustache :edit
       else
         mustache :create
