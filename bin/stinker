@@ -111,9 +111,23 @@ if options['irb']
     exit 0
   end
 else
-  require 'stinker/frontend/app'
+  require 'stinker/frontend/adapter'
+  # Guess which handler we should use
+  begin
+    handler = Rack::Handler::Mongrel
+  rescue LoadError => e
+    handler = Rack::Handler::WEBrick
+  end
+
+  site = Stinker::Site.new(stinker_path, wiki_options)
+  adapter = if site.nanoc?
+    :nanoc
+  else
+    :passthrough
+  end
+
+  
   MyPrecious::App.set(:stinker_path, stinker_path)
-  wiki_options[:page_file_dir] ||= 'content'
   MyPrecious::App.set(:wiki_options, wiki_options)
 
   if cfg = options['config']
@@ -123,5 +137,13 @@ else
     require cfg
   end
 
-  MyPrecious::App.run!(options)
+  app = MyPrecious::Adapter.build(adapter)
+  # Set options
+  options_for_rack = {
+    :Port      => (options[:port] || 3000).to_i,
+    :Host      => (options[:host] || '0.0.0.0')
+  }
+
+  puts "Running on http://#{options_for_rack[:Host]}:#{options_for_rack[:Port]}/"
+  handler.run(app, options_for_rack)
 end

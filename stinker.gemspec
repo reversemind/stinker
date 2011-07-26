@@ -82,8 +82,6 @@ Gem::Specification.new do |s|
     lib/stinker/frontend/templates/layout.mustache
     lib/stinker/frontend/templates/page.mustache
     lib/stinker/frontend/templates/pages.mustache
-    lib/stinker/frontend/templates/search.mustache
-    lib/stinker/frontend/templates/searchbar.mustache
     lib/stinker/frontend/views/compare.rb
     lib/stinker/frontend/views/create.rb
     lib/stinker/frontend/views/edit.rb
@@ -93,7 +91,6 @@ Gem::Specification.new do |s|
     lib/stinker/frontend/views/layout.rb
     lib/stinker/frontend/views/page.rb
     lib/stinker/frontend/views/pages.rb
-    lib/stinker/frontend/views/search.rb
     lib/stinker/git_access.rb
     lib/stinker/markup.rb
     lib/stinker/page.rb
