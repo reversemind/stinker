@@ -91,14 +91,14 @@ if options['irb']
   end
 
   begin
-    wiki = Stinker::Site.new(stinker_path, wiki_options)
-    if !wiki.exist? then raise Grit::InvalidGitRepositoryError end
-    puts "Loaded Stinker wiki at #{File.expand_path(stinker_path).inspect}."
+    site = Stinker::Site.new(stinker_path, wiki_options)
+    if !site.exist? then raise Grit::InvalidGitRepositoryError end
+    puts "Loaded Stinker site at #{File.expand_path(stinker_path).inspect}."
     puts
-    puts %(    page = wiki.page('page-name'))
+    puts %(    page = site.page('page-name'))
     puts %(    # => <Stinker::Page>)
     puts
-    puts %(    page.raw_data)
+    puts %(    page.raw_text_data)
     puts %(    # => "# My wiki page")
     puts
     puts %(    page.formatted_data)

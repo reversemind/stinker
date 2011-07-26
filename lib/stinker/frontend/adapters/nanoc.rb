@@ -1,4 +1,4 @@
-require 'nanoc3'
+require 'nanoc'
 
 module MyPrecious
   module Adapters
@@ -13,7 +13,9 @@ module MyPrecious
           map '/_stinker' do
             run MyPrecious::App
           end
-          run autocompiler
+          map '/' do
+            run autocompiler
+          end
         end.to_app
       end
     end

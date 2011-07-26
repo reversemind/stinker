@@ -6,7 +6,6 @@ require 'stinker/frontend/app'
 module MyPrecious
   class Adapter
     def self.build(type)
-      puts "Adapter type = #{type}"
       case type
       when :nanoc
         app =  MyPrecious::Adapters::Nanoc.build
