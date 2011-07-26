@@ -39,7 +39,7 @@ module MyPrecious
     end
 
     get '/' do
-      show_page_or_file('Home')
+      show_page_or_file('Index')
     end
 
     get '/edit/*' do

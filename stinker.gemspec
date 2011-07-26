@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = '0.0.2'
 
   s.name              = 'stinker'
-  s.version           = '0.0.3'
-  s.date              = '2011-07-11'
+  s.version           = '0.0.4'
+  s.date              = '2011-07-25'
   s.rubyforge_project = 'stinker'
 
   s.summary     = "A simple, Git-powered site."

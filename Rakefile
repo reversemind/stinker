@@ -105,6 +105,10 @@ task :build => :gemspec do
   sh "mv #{gem_file} pkg"
 end
 
+task :install => :build do
+  sh "gem install pkg/#{gem_file}"
+end
+
 task :gemspec => :validate do
   # read spec file and split out manifest section
   spec = File.read(gemspec_file)
