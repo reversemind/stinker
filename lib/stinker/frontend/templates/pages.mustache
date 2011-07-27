@@ -2,8 +2,8 @@
 <div id="head">
   <h1>{{title}}</h1>
   <ul class="actions">
-    <li class="minibutton"><a href="{{root_url}}/"
-       class="action-edit-page">Home</a></li>
+    <li class="minibutton"><a href="/"
+       class="action-edit-page">View Site</a></li>
   </ul>
 </div>
 <div id="results">
@@ -12,7 +12,7 @@
   <ul>
     {{#results}}
     <li>
-      <a href="{{root_url}}/{{name}}">{{name}}</a> 
+      <a href="{{root_url}}/edit/{{name}}">{{name}}</a> 
     </li>
     {{/results}}
   </ul>

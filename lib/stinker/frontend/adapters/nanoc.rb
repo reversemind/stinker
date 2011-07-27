@@ -5,6 +5,7 @@ module MyPrecious
     class Nanoc
       def self.build
         puts "Detected Nanoc site (saw a Rules file)"
+        puts "Editor available at /_stinker"
         MyPrecious::App.set(:root_url, '/_stinker')
         autocompiler = self.new('.')
         app = Rack::Builder.new do

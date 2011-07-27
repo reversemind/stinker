@@ -151,6 +151,7 @@ module Stinker
       @history_sanitization = options[:history_sanitization] ||
         self.class.history_sanitization
       @site_config = load_config_file || {}
+      @nanoc_rules = self.file('Rules')
       if(@site_config["page_file_dir"] && !options[:page_file_dir] && !options[:access])
         @page_file_dir = @site_config["page_file_dir"]
         @access = GitAccess.new(path, @site_config["page_file_dir"])
@@ -167,6 +168,7 @@ module Stinker
     #
     # Returns true if the site has a Rules file.
     def nanoc?
+      return true if @nanoc_rules
       return true if @site_config["nanoc"]
       self.file('Rules').nil? ? false : true
     end

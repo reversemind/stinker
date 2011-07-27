@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 
   s.name              = 'stinker'
   s.version           = '0.0.5'
-  s.date              = '2011-07-25'
+  s.date              = '2011-07-26'
   s.rubyforge_project = 'stinker'
 
   s.summary     = "A simple, Git-powered site."
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency('mustache', [">= 0.11.2", "< 1.0.0"])
   s.add_dependency('sanitize', "~> 2.0.0")
   s.add_dependency('nanoc3', "~> 3.2.0")
-  s.add_dependency('nokogiri', "~> 1.4.0")
+  s.add_dependency('nokogiri', "~> 1.5.0")
 
   s.add_development_dependency('RedCloth')
   s.add_development_dependency('mocha')

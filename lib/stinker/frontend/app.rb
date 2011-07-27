@@ -44,7 +44,7 @@ module MyPrecious
     end
 
     get '/' do
-      show_page_or_file('Index')
+      redirect @root_url + '/pages'
     end
 
     get '/edit/*' do
@@ -52,6 +52,7 @@ module MyPrecious
       @site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
       if page = @site.page(@name)
         @page = page
+        @meta = page.meta_data
         @content = page.raw_text_data
         mustache :edit
       else
@@ -62,17 +63,18 @@ module MyPrecious
     post '/edit/*' do
       site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
       page = site.page(params[:splat].first)
-      name = params[:rename] || page.name
+      name = params[:page_name] || page.name || params[:page_title]
       committer = Stinker::Committer.new(site, commit_message)
       commit    = {:committer => committer}
+      meta = {'title' => params[:page_title]}
 
-      update_site_page(site, page, params[:content], commit, name,
+      meta.merge!(params[:extras]) if params[:extras]
+
+      update_site_page(site, page, params[:content], commit, meta, name,
         params[:format])
-      update_site_page(site, page.footer,  params[:footer],  commit) if params[:footer]
-      update_site_page(site, page.sidebar, params[:sidebar], commit) if params[:sidebar]
       committer.commit
 
-      redirect "/#{CGI.escape(Stinker::Page.cname(name))}"
+      redirect @root_url + "/"
     end
 
     post '/create' do
@@ -83,7 +85,7 @@ module MyPrecious
 
       begin
         site.write_page(name, format, params[:content], commit_message)
-        redirect "/#{CGI.escape(name)}"
+        redirect @root_url + "/#{CGI.escape(name)}"
       rescue Stinker::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
@@ -99,7 +101,7 @@ module MyPrecious
       sha2  = shas.shift
 
       if site.revert_page(@page, sha1, sha2, commit_message)
-        redirect "/#{CGI.escape(@name)}"
+        redirect @root_url + "/#{CGI.escape(@name)}"
       else
         sha2, sha1 = sha1, "#{sha1}^" if !sha2
         @versions = [sha1, sha2]
@@ -130,9 +132,9 @@ module MyPrecious
     post '/compare/:name' do
       @versions = params[:versions] || []
       if @versions.size < 2
-        redirect "/history/#{CGI.escape(params[:name])}"
+        redirect @root_url + "/history/#{CGI.escape(params[:name])}"
       else
-        redirect "/compare/%s/%s...%s" % [
+        redirect @root_url +  "/compare/%s/%s...%s" % [
           CGI.escape(params[:name]),
           @versions.last,
           @versions.first]
@@ -186,13 +188,11 @@ module MyPrecious
     end
 
     def show_page_or_file(name)
-      site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
-      if page = site.page(name)
-        @page = page
-        @name = name
-        @content = page.formatted_data
-        mustache :page
-      elsif file = site.file(name)
+      @site = Stinker::Site.new(settings.stinker_path, settings.wiki_options)
+      if page = @site.page(name)
+        name = name =~ /^[Ii]ndex/ ? "" : name
+        redirect '/'+name +'/'
+      elsif file = @site.file(name)
         content_type file.mime_type
         file.raw_data
       else
@@ -201,13 +201,14 @@ module MyPrecious
       end
     end
 
-    def update_site_page(site, page, content, commit_message, name = nil, format = nil)
+    def update_site_page(site, page, content, commit_message, meta = {}, name = nil, format = nil)
       return if !page ||  
         ((!content || page.raw_data == content) && page.format == format)
       name    ||= page.name
       format    = (format || page.format).to_sym
-      content ||= page.raw_data
-      site.update_page(page, name, format, content.to_s, commit_message)
+      meta ||= page.meta_data
+      content ||= page.raw_text_data
+      site.update_page_with_meta(page, name, format, content.to_s, meta, commit_message)
     end
 
     def commit_message

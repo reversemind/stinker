@@ -10,7 +10,7 @@ module MyPrecious
       end
 
       def page_name
-        @name.gsub('-', ' ')
+        @page.title || @page.name.gsub('-', ' ')
       end
 
       def footer
@@ -22,6 +22,36 @@ module MyPrecious
           end
         end
         @footer
+      end
+
+      def meta_fields
+        fields = @site.content_types[content_type] || {}
+        fields.collect do |field, value_type|
+          my_val =  (@page.meta_data ? (@page.meta_data[field] || "") : "")
+          {"field_name" => field, 
+            "human_field_name" => field.capitalize, 
+            "field_value" => my_val
+          }.merge(field_info(value_type, my_val))
+        end
+      end
+
+      def field_info(type, val = nil)
+        case type
+        when "text"
+          {"is_text" => true, "field_type" => "text"}
+        when "fulltext"
+          {"is_fulltext" => true, "field_type" => "fulltext"}
+        when "image"
+          {"is_image" => true, "field_type" => "image", "field_image_list" => image_list(val)}
+        when "asset"
+          {"is_asset" => true, "field_type" => "asset", "field_assets_list" => assets_list(val)}
+        else
+          {"field_type" => "unknown"}
+        end
+      end
+
+      def has_meta_fields
+        meta_fields.size > 0
       end
 
       def sidebar
